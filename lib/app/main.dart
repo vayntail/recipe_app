@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_app/app/views/calendar_view.dart';
 import 'package:recipe_app/app/views/groceries_view.dart';
-import 'package:recipe_app/app/views/recipe_view.dart';
+import 'package:recipe_app/app/views/recipes_view.dart';
 import 'package:recipe_app/app/views/settings_view.dart';
 
 void main() {
@@ -39,7 +39,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 /// Main Layout Wrapper
 class MainWrapper extends StatefulWidget {
   const MainWrapper({super.key});
@@ -54,33 +53,15 @@ class _MainWrapperState extends State<MainWrapper> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /// Title Bar
-      appBar: [
-        AppBar(title: const Text('Recipes'), actions: <Widget>[
-          IconButton(
-              icon: const Icon(Icons.add),
-              tooltip: 'New Recipe',
-              onPressed: () {})
-        ]),
-        AppBar(title: const Text('Groceries')),
-        AppBar(title: const Text('Calendar'), actions: <Widget>[
-                    IconButton(
-              icon: const Icon(Icons.calendar_month),
-              tooltip: 'Month View',
-              onPressed: () {})
-        ]),
-        AppBar(title: const Text('Settings')),
-      ][selectedIndex],
-
-
       /// Body
-      body: [
-        const RecipesView(),
-        const GroceriesView(),
-        const CalendarView(),
-        const SettingsView(),
-      ][selectedIndex],
-
+      body: Padding(
+          padding: const EdgeInsets.only(top: 40), // Main Container Padding
+          child: [
+            const RecipesView(),
+            const GroceriesView(),
+            const CalendarView(),
+            const SettingsView(),
+          ][selectedIndex]),
 
       /// Bottom Nav Bar
       bottomNavigationBar: NavigationBar(

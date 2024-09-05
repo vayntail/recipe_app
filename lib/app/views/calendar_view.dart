@@ -5,6 +5,14 @@ class CalendarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(title: const Text('Calendar'), actions: <Widget>[
+                    IconButton(
+              icon: const Icon(Icons.calendar_month),
+              tooltip: 'Month View',
+              onPressed: () {})
+        ]),
+      body: const Placeholder(),
+    );
   }
 }
