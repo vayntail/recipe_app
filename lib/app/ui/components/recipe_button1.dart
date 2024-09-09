@@ -1,15 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:recipe_app/app/model/recipe.dart';
 
 class RecipeButton1 extends StatelessWidget {
   const RecipeButton1(
       {super.key,
-      required this.name,
-      required this.description,
-      required this.minutes});
+      required this.recipe});
 
-  final String name;
-  final String description;
-  final int minutes;
+  final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +36,7 @@ class RecipeButton1 extends StatelessWidget {
                 height: 100,
                 width: 100,
                 color: Colors.grey[200],
+                child:  Image(image: AssetImage(recipe.imgPath)),
               ),
 
               /// Horizontal Spacer
@@ -49,14 +49,14 @@ class RecipeButton1 extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name),
-                    Text(description),
+                    Text(recipe.name),
+                    Text(recipe.description),
                   ],
                 ),
               ),
 
               /// Time Text
-              Text("${minutes}min."),
+              Text("${recipe.minutes}min."),
             ],
           ),
         ),
