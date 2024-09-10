@@ -27,5 +27,5 @@ class Recipe {
   final List<Recipe> recipesList = [
     Recipe(name: "Chili", imgPath: "assets/imgs/chili-img.jpeg", description: "American chili!", minutes: 20, tags: ["american"]),
     Recipe(name: "Kimbap", imgPath: "assets/imgs/kimbap-img.jpg", description: "Korean Kimbap!", minutes: 10, tags: ["korean"]),
-    Recipe(name: "Korean & American Sandwich", imgPath: "assets/imgs/kimbap-img.jpg", description: "Sandwich!", minutes: 10, tags: ["american", "korean"]),
+    Recipe(name: "Sandwich", imgPath: "assets/imgs/sandwich-img.jpg", description: "Sandwich!", minutes: 10, tags: ["american", "korean"]),
   ];

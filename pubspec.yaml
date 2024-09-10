@@ -19,6 +19,8 @@ dependencies:
   # Add SQLite and path provider for database handling
   sqflite: ^2.3.3+1
   path_provider: ^2.1.4
+  table_calendar: ^3.1.2
+  dotted_border: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -32,6 +34,8 @@ flutter:
   assets:
     - assets/imgs/chili-img.jpeg
     - assets/imgs/kimbap-img.jpg
+    - assets/imgs/sandwich-img.jpg
+    
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
