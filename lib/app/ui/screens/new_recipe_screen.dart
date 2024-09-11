@@ -65,44 +65,49 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
     if (pickedFile != null) {
       setState(() {
         _imagePath = pickedFile.path;
+        print('Image path: $_imagePath'); // Print the image path here
       });
     }
   }
 
   Future<void> _saveRecipe() async {
-    final int recipeId = await _recipeOperations.insertRecipe(
-      _recipeNameController.text,
-      _descriptionController.text,
-      _imagePath ?? '',
-      _selectedHour,
-      _selectedMinute,
-      _directionsController.text,
-      _linkController.text,
-    );
+    try {
+      final int recipeId = await _recipeOperations.insertRecipe(
+        _recipeNameController.text,
+        _descriptionController.text,
+        _imagePath ?? '', // Ensure _imagePath is handled correctly
+        _selectedHour,
+        _selectedMinute,
+        _directionsController.text,
+        _linkController.text,
+      );
 
-    // Save ingredients
-    for (var controller in _ingredientControllers) {
-      String ingredient = controller.text;
-      if (ingredient.isNotEmpty) {
-        await _recipeOperations.addIngredientToRecipe(recipeId, ingredient);
+      // Save ingredients
+      for (var controller in _ingredientControllers) {
+        String ingredient = controller.text;
+        if (ingredient.isNotEmpty) {
+          await _recipeOperations.addIngredientToRecipe(recipeId, ingredient);
+        }
       }
+
+      // Save tags
+      for (String tag in _tags) {
+        await _recipeOperations.addTagToRecipe(recipeId, tag);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Recipe Saved Successfully')),
+      );
+
+      _resetIngredients();
+    } catch (e) {
+      print('Error saving recipe: $e');
     }
-
-    // Save tags
-    for (String tag in _tags) {
-      await _recipeOperations.addTagToRecipe(recipeId, tag);
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Recipe Saved Successfully')),
-    );
-
-    // Function to reset to 4 text boxes after saving
-    _resetIngredients();
   }
 
   void _resetIngredients() {
     setState(() {
+      _ingredientControllers.forEach((controller) => controller.dispose());
       _ingredientControllers = List.generate(4, (_) => TextEditingController());
     });
   }
@@ -124,7 +129,8 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
           IconButton(
             onPressed: _saveRecipe,
             icon: const Icon(Icons.check),
-          )
+          ),
+          IconButton(onPressed: _testSQL, icon: const Icon(Icons.check))
         ],
       ),
       body: TabBarView(
@@ -135,6 +141,23 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
         ],
       ),
     );
+  }
+
+  Future<void> _testSQL() async {
+    try {
+      final int recipeId = await _recipeOperations.insertRecipe(
+          'test recipe', // Recipe name
+          'rsss', // Recipe description
+          'abcdefabcdefabcdefabcdefabcdef', // Image path
+          1, // Hours
+          19, // Minutes
+          'dsdsdsds', // Directions
+          'dsdsdsds' // Link
+          );
+      print('Test recipe inserted with ID: $recipeId');
+    } catch (e) {
+      print('Error inserting test recipe: $e');
+    }
   }
 
   Widget _buildRecipeTab() {
@@ -226,10 +249,12 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
         const SizedBox(width: 8),
         ElevatedButton(
           onPressed: () {
-            setState(() {
-              _tags.add(_tagController.text);
-              _tagController.clear();
-            });
+            if (_tagController.text.isNotEmpty) {
+              setState(() {
+                _tags.add(_tagController.text);
+                _tagController.clear();
+              });
+            }
           },
           child: const Text('Add Tag'),
         ),

@@ -7,7 +7,7 @@ class RecipeButton1 extends StatelessWidget {
     required this.name,
     required this.description,
     required this.minutes,
-    required this.imagePath, // Add imagePath
+    required this.imagePath,
   });
 
   final String name;
@@ -44,8 +44,11 @@ class RecipeButton1 extends StatelessWidget {
                   color: Colors.grey[200],
                   image: imagePath.isNotEmpty
                       ? DecorationImage(
-                          image: FileImage(
-                              File(imagePath)), // Load image from file path
+                          image: File(imagePath).existsSync()
+                              ? FileImage(
+                                  File(imagePath)) // Load image from file path
+                              : AssetImage('assets/placeholder.png')
+                                  as ImageProvider, // Placeholder image
                           fit: BoxFit.cover,
                         )
                       : null,
