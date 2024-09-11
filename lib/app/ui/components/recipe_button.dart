@@ -1,19 +1,15 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
 
-class RecipeButton1 extends StatelessWidget {
-  const RecipeButton1({
+import 'package:flutter/material.dart';
+import 'package:recipe_app/app/model/recipe.dart';
+
+class RecipeButton extends StatelessWidget {
+  const RecipeButton({
     super.key,
-    required this.name,
-    required this.description,
-    required this.minutes,
-    required this.imagePath,
+    required this.recipe
   });
 
-  final String name;
-  final String description;
-  final int minutes;
-  final String imagePath;
+  final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {
@@ -42,20 +38,17 @@ class RecipeButton1 extends StatelessWidget {
                 width: 100,
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
-                  image: imagePath.isNotEmpty
+                  image: recipe.imagePath.isNotEmpty
                       ? DecorationImage(
-                          image: File(imagePath).existsSync()
-                              ? FileImage(
-                                  File(imagePath)) // Load image from file path
-                              : AssetImage('assets/placeholder.png')
-                                  as ImageProvider, // Placeholder image
+                          image: FileImage(
+                              File(recipe.imagePath)), // Load image from file path
                           fit: BoxFit.cover,
                         )
                       : null,
                 ),
               ),
 
-              /// Horizontal Spacer
+              // /// Horizontal Spacer
               const SizedBox(width: 20),
 
               /// Name + Description Texts
@@ -64,14 +57,14 @@ class RecipeButton1 extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name,
+                      recipe.recipeName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
                     Text(
-                      description,
+                      recipe.recipeDescription,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -80,7 +73,7 @@ class RecipeButton1 extends StatelessWidget {
               ),
 
               /// Time Text
-              Text("$minutes min."),
+              // Text("${recipe.minutes} min."),
             ],
           ),
         ),

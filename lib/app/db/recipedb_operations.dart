@@ -1,9 +1,12 @@
+import 'package:recipe_app/app/model/recipe.dart';
 import 'package:sqflite/sqflite.dart';
 import 'database.dart';
 
 class RecipeOperations {
   final DatabaseHelper _dbHelper = DatabaseHelper();
+  // Get user's grocery list (list of ingredients)
 
+  // Get ingredients for a specific recipe
   Future<List<Map<String, dynamic>>> getIngredientsForRecipe(
       int recipeId) async {
     final db = await _dbHelper.database;
@@ -14,6 +17,7 @@ class RecipeOperations {
     );
   }
 
+  // Get meals for a specific recipe
   Future<List<Map<String, dynamic>>> getMealsForRecipe(int recipeId) async {
     final db = await _dbHelper.database;
     return await db.query(
@@ -23,6 +27,7 @@ class RecipeOperations {
     );
   }
 
+  // Get tags for a specific recipe
   Future<List<Map<String, dynamic>>> getTagsForRecipe(int recipeId) async {
     final db = await _dbHelper.database;
     return await db.rawQuery('''
@@ -33,6 +38,7 @@ class RecipeOperations {
     ''', [recipeId]);
   }
 
+  // Get recipes for a specific tag
   Future<List<Map<String, dynamic>>> getRecipesForTag(int tagId) async {
     final db = await _dbHelper.database;
     return await db.rawQuery('''
@@ -43,6 +49,7 @@ class RecipeOperations {
     ''', [tagId]);
   }
 
+  // Get meals for a specific date
   Future<List<Map<String, dynamic>>> getMealsForDate(String date) async {
     final db = await _dbHelper.database;
     return await db.rawQuery('''
@@ -55,6 +62,8 @@ class RecipeOperations {
     ''', [date]);
   }
 
+
+  // Insert a recipe into the database
   Future<int> insertRecipe(
     String recipeName,
     String recipeDescription,
@@ -64,69 +73,50 @@ class RecipeOperations {
     String directions,
     String link,
   ) async {
-    try {
-      final db = await _dbHelper.database;
+    final db = await _dbHelper.database;
 
-      // Debugging output
-      print("Validating data...");
-      print("recipeName length: ${recipeName.length}");
-      print("recipeDescription length: ${recipeDescription.length}");
-      print("directions length: ${directions.length}");
-      print("link length: ${link.length}");
-      print("hours: $hours");
-      print("minutes: $minutes");
+    final Map<String, dynamic> recipe = {
+      'recipe_name': recipeName,
+      'recipe_description': recipeDescription,
+      'image_path': imagePath,
+      'hours': hours,
+      'minutes': minutes,
+      'directions': directions,
+      'link': link,
+    };
 
-      // Validate data
-      if (recipeName.length > 20 ||
-          recipeDescription.length > 70 ||
-          directions.length > 1000 ||
-          link.length > 100 ||
-          hours < 0 ||
-          hours > 24 ||
-          minutes < 0 ||
-          minutes >= 60) {
-        throw ArgumentError('Invalid data for recipe');
-      }
-
-      final Map<String, dynamic> recipe = {
-        'recipe_name': recipeName,
-        'recipe_description': recipeDescription,
-        'image_path': imagePath,
-        'hours': hours,
-        'minutes': minutes,
-        'directions': directions,
-        'link': link,
-      };
-
-      print("Inserting recipe: $recipe");
-      final result = await db.insert('recipes', recipe);
-      print("Insert result: $result");
-      return result;
-    } catch (e) {
-      print('Error inserting recipe: $e');
-      rethrow;
-    }
+    // Insert the recipe into the database and return the recipe ID
+    return await db.insert('recipes', recipe);
   }
 
+  // Insert a tag into the database
   Future<int> insertTag(String tagName) async {
     final db = await _dbHelper.database;
 
+    // Check if the tag already exists
     var result =
         await db.query('tag', where: 'tag_name = ?', whereArgs: [tagName]);
 
     if (result.isNotEmpty) {
       return result.first['tag_id'] as int;
     } else {
+      // Insert the new tag and return its ID
       return await db.insert('tag', {'tag_name': tagName});
     }
   }
 
+  // Add a tag to a recipe
   Future<void> addTagToRecipe(int recipeId, String tagName) async {
     final db = await _dbHelper.database;
+
+    // Insert tag and get its ID
     int tagId = await insertTag(tagName);
+
+    // Link the tag to the recipe
     await db.insert('recipe_tag', {'recipe_id': recipeId, 'tag_id': tagId});
   }
 
+  // Insert ingredients into a specific recipe
   Future<void> addIngredientToRecipe(int recipeId, String ingredient) async {
     final db = await _dbHelper.database;
     await db.insert(
@@ -139,8 +129,24 @@ class RecipeOperations {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getRecipes() async {
+  // Get all recipes
+  Future<List<Recipe>> getRecipes() async {
     final db = await _dbHelper.database;
-    return await db.query('recipes');
+    List<Recipe> recipes = [];
+
+    // Query all recipes from the "recipes" table
+    final List<Map<String, dynamic>> dbRecipes = await db.query('recipes');
+    for (var dbRecipe in dbRecipes){
+      recipes.add(Recipe(
+        recipeId: dbRecipe['recipe_id'],
+        imagePath: dbRecipe['image_path'],
+        recipeName: dbRecipe['recipe_name'],
+        recipeDescription: dbRecipe['recipe_description'],
+        hours: dbRecipe['hours'],
+        minutes: dbRecipe['minutes'],
+        directions: dbRecipe['directions'],
+        link: dbRecipe['link']));
+    }
+    return recipes;
   }
 }
