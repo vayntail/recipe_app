@@ -21,7 +21,7 @@ class _GroceriesViewState extends State<GroceriesView> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Today's List"),
+                const Text("Today's List"),
                 Row(
                   children: [
                     // Buttons
@@ -82,11 +82,9 @@ class _ListItemState extends State<ListItem> {
             }),
         const Flexible(
           child: TextField(
-            decoration: InputDecoration(
-              hintText: "Type an ingredient...",
-            )
-            
-          ),
+              decoration: InputDecoration(
+            hintText: "Type an ingredient...",
+          )),
         ),
       ],
     );

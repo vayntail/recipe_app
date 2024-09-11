@@ -11,11 +11,10 @@ class CalendarView extends StatefulWidget {
 }
 
 class _CalendarViewState extends State<CalendarView> {
-    CalendarFormat calendarFormat = CalendarFormat.week;
+  CalendarFormat calendarFormat = CalendarFormat.week;
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(title: const Text('Calendar'), actions: <Widget>[
         IconButton(
@@ -23,13 +22,11 @@ class _CalendarViewState extends State<CalendarView> {
             tooltip: 'Month View',
             onPressed: () {
               setState(() {
-                if (calendarFormat==CalendarFormat.month){
-calendarFormat = CalendarFormat.week;
+                if (calendarFormat == CalendarFormat.month) {
+                  calendarFormat = CalendarFormat.week;
+                } else {
+                  calendarFormat = CalendarFormat.month;
                 }
-                else {
-                  calendarFormat=CalendarFormat.month;
-                }
-                
               });
             })
       ]),
@@ -46,7 +43,7 @@ calendarFormat = CalendarFormat.week;
                   ),
                 ),
                 child: ListView(
-                  children: [
+                  children: const [
                     Text("Breakfast"),
                     PlanButton(),
                     Text("Lunch"),
@@ -77,9 +74,9 @@ class _PlanButtonState extends State<PlanButton> {
         radius: const Radius.circular(12),
         dashPattern: const [10, 5],
         child: ClipRRect(
-          borderRadius: BorderRadius.all(const Radius.circular(12)),
-          child: Container(
-              height: 100, child: Center(child: Text("Select a Recipe"))),
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          child: SizedBox(
+              height: 100, child: const Center(child: Text("Select a Recipe"))),
         ));
   }
 }
