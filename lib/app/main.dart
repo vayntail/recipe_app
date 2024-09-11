@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:recipe_app/app/themes.dart';
+import 'package:recipe_app/app/ui/themes/themes.dart';
 import 'package:recipe_app/app/ui/views/calendar_view.dart';
 import 'package:recipe_app/app/ui/views/groceries_view.dart';
 import 'package:recipe_app/app/ui/views/recipes_view.dart';

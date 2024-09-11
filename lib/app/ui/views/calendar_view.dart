@@ -73,10 +73,10 @@ class _PlanButtonState extends State<PlanButton> {
         borderType: BorderType.RRect,
         radius: const Radius.circular(12),
         dashPattern: const [10, 5],
-        child: ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
+        child: const ClipRRect(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
           child: SizedBox(
-              height: 100, child: const Center(child: Text("Select a Recipe"))),
+              height: 100, child: Center(child: Text("Select a Recipe"))),
         ));
   }
 }

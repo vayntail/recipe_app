@@ -33,7 +33,7 @@ class DatabaseHelper {
         await db.execute('''
           CREATE TABLE recipes (
             recipe_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            image_path TEXT CHECK(length(image_path) <= 30), 
+            image_path TEXT, 
             recipe_name TEXT CHECK(length(recipe_name) <= 20),
             recipe_description TEXT CHECK(length(recipe_description) <= 70),
             hours INTEGER CHECK(hours >= 0 AND hours <= 24),

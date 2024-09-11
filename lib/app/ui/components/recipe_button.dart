@@ -1,9 +1,10 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:recipe_app/app/model/recipe.dart';
 
-class RecipeButton1 extends StatelessWidget {
-  const RecipeButton1({
+class RecipeButton extends StatelessWidget {
+  const RecipeButton({
     super.key,
     required this.recipe
   });
@@ -37,17 +38,17 @@ class RecipeButton1 extends StatelessWidget {
                 width: 100,
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
-                  image: recipe.imgPath.isNotEmpty
+                  image: recipe.imagePath.isNotEmpty
                       ? DecorationImage(
                           image: FileImage(
-                              File(recipe.imgPath)), // Load image from file path
+                              File(recipe.imagePath)), // Load image from file path
                           fit: BoxFit.cover,
                         )
                       : null,
                 ),
               ),
 
-              /// Horizontal Spacer
+              // /// Horizontal Spacer
               const SizedBox(width: 20),
 
               /// Name + Description Texts
@@ -56,14 +57,14 @@ class RecipeButton1 extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      recipe.name,
+                      recipe.recipeName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
                     Text(
-                      recipe.description,
+                      recipe.recipeDescription,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -72,7 +73,7 @@ class RecipeButton1 extends StatelessWidget {
               ),
 
               /// Time Text
-              Text("$recipe.minutes min."),
+              // Text("${recipe.minutes} min."),
             ],
           ),
         ),
