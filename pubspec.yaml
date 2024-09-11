@@ -17,8 +17,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   
   # Add SQLite and path provider for database handling
-  sqflite: ^2.3.3+1
+  sqflite: ^2.0.0+4
   path_provider: ^2.1.4
+  image_picker: ^0.8.5+3
 
 dev_dependencies:
   flutter_test:
