@@ -1,19 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:recipe_app/app/model/recipe.dart';
 
 class RecipeButton1 extends StatelessWidget {
   const RecipeButton1({
     super.key,
-    required this.name,
-    required this.description,
-    required this.minutes,
-    required this.imagePath, // Add imagePath
+    required this.recipe
   });
 
-  final String name;
-  final String description;
-  final int minutes;
-  final String imagePath;
+  final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +37,10 @@ class RecipeButton1 extends StatelessWidget {
                 width: 100,
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
-                  image: imagePath.isNotEmpty
+                  image: recipe.imgPath.isNotEmpty
                       ? DecorationImage(
                           image: FileImage(
-                              File(imagePath)), // Load image from file path
+                              File(recipe.imgPath)), // Load image from file path
                           fit: BoxFit.cover,
                         )
                       : null,
@@ -61,14 +56,14 @@ class RecipeButton1 extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name,
+                      recipe.name,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
                     Text(
-                      description,
+                      recipe.description,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -77,7 +72,7 @@ class RecipeButton1 extends StatelessWidget {
               ),
 
               /// Time Text
-              Text("$minutes min."),
+              Text("$recipe.minutes min."),
             ],
           ),
         ),
