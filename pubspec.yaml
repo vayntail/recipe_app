@@ -19,7 +19,6 @@ dependencies:
   # Add SQLite and path provider for database handling
   sqflite: ^2.0.0+4
   path_provider: ^2.1.4
-  image_picker: ^0.8.5+3
 
 dev_dependencies:
   flutter_test:
@@ -30,9 +29,11 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/imgs/chili-img.jpeg
+    - assets/imgs/kimbap-img.jpg
+    - assets/imgs/sandwich-img.jpg
+    
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

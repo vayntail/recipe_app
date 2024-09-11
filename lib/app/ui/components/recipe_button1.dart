@@ -1,26 +1,18 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:recipe_app/app/model/recipe.dart';
 
 class RecipeButton1 extends StatelessWidget {
-  const RecipeButton1({
-    super.key,
-    required this.name,
-    required this.description,
-    required this.minutes,
-    required this.imagePath, // Add imagePath
-  });
+  const RecipeButton1(
+      {super.key,
+      required this.recipe});
 
-  final String name;
-  final String description;
-  final int minutes;
-  final String imagePath; // Add imagePath
+  final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Handle tap on the card
+        // On Card Pressed
       },
       child: Card(
         shape: RoundedRectangleBorder(
@@ -41,37 +33,28 @@ class RecipeButton1 extends StatelessWidget {
               Container(
                 height: 100,
                 width: 100,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  image: imagePath.isNotEmpty
-                      ? DecorationImage(
-                          image: FileImage(
-                              File(imagePath)), // Load image from file path
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-                ),
+                color: Colors.grey[200],
+                child:  Image(image: AssetImage(recipe.imgPath)),
               ),
 
               /// Horizontal Spacer
-              const SizedBox(width: 20),
+              const SizedBox(
+                width: 20,
+              ),
 
               /// Name + Description Texts
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
-                    Text(description,
-                        maxLines: 2, overflow: TextOverflow.ellipsis),
+                    Text(recipe.name),
+                    Text(recipe.description),
                   ],
                 ),
               ),
 
               /// Time Text
-              Text("${minutes}min."),
+              Text("${recipe.minutes}min."),
             ],
           ),
         ),
