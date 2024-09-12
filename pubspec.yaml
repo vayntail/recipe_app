@@ -28,6 +28,14 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/icons/calendar_active.png
+    - assets/icons/calendar_inactive.png
+    - assets/icons/groceries_active.png
+    - assets/icons/groceries_inactive.png
+    - assets/icons/recipes_active.png
+    - assets/icons/recipes_inactive.png
+    - assets/icons/settings_active.png
+    - assets/icons/settings_inactive.png
     - assets/imgs/chili-img.jpeg
     - assets/imgs/kimbap-img.jpg
     - assets/imgs/sandwich-img.jpg

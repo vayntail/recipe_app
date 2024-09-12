@@ -1,11 +1,11 @@
+import 'package:recipe_app/app/model/grocery_item.dart';
 import 'package:recipe_app/app/model/recipe.dart';
 import 'package:sqflite/sqflite.dart';
 import 'database.dart';
 
 class RecipeOperations {
   final DatabaseHelper _dbHelper = DatabaseHelper();
-  // Get user's grocery list (list of ingredients)
-
+  
   // Get ingredients for a specific recipe
   Future<List<Map<String, dynamic>>> getIngredientsForRecipe(
       int recipeId) async {
@@ -61,7 +61,6 @@ class RecipeOperations {
       WHERE c.date = ?
     ''', [date]);
   }
-
 
   // Insert a recipe into the database
   Future<int> insertRecipe(
@@ -136,16 +135,16 @@ class RecipeOperations {
 
     // Query all recipes from the "recipes" table
     final List<Map<String, dynamic>> dbRecipes = await db.query('recipes');
-    for (var dbRecipe in dbRecipes){
+    for (var dbRecipe in dbRecipes) {
       recipes.add(Recipe(
-        recipeId: dbRecipe['recipe_id'],
-        imagePath: dbRecipe['image_path'],
-        recipeName: dbRecipe['recipe_name'],
-        recipeDescription: dbRecipe['recipe_description'],
-        hours: dbRecipe['hours'],
-        minutes: dbRecipe['minutes'],
-        directions: dbRecipe['directions'],
-        link: dbRecipe['link']));
+          recipeId: dbRecipe['recipe_id'],
+          imagePath: dbRecipe['image_path'],
+          recipeName: dbRecipe['recipe_name'],
+          recipeDescription: dbRecipe['recipe_description'],
+          hours: dbRecipe['hours'],
+          minutes: dbRecipe['minutes'],
+          directions: dbRecipe['directions'],
+          link: dbRecipe['link']));
     }
     return recipes;
   }
