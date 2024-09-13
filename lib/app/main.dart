@@ -53,6 +53,8 @@ class _MainWrapperState extends State<MainWrapper> {
 
       /// Bottom Nav Bar
       bottomNavigationBar: NavigationBar(
+        indicatorColor: const Color.fromARGB(0, 255, 255, 255),
+        height: 110,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         selectedIndex: selectedIndex,
         onDestinationSelected: (int index) {
@@ -60,21 +62,25 @@ class _MainWrapperState extends State<MainWrapper> {
             selectedIndex = index;
           });
         },
-        destinations: const <Widget>[
+        destinations: <Widget>[
           NavigationDestination(
-            icon: Icon(Icons.food_bank),
+            icon: Image.asset("assets/icons/recipes_inactive.png"),
+            selectedIcon: Image.asset("assets/icons/recipes_active.png"),
             label: 'Recipes',
           ),
           NavigationDestination(
-            icon: Icon(Icons.list),
+            icon: Image.asset("assets/icons/groceries_inactive.png"),
+            selectedIcon: Image.asset("assets/icons/groceries_active.png"),
             label: 'Groceries',
           ),
           NavigationDestination(
-            icon: Icon(Icons.calendar_today),
+            icon: Image.asset("assets/icons/calendar_inactive.png"),
+            selectedIcon: Image.asset("assets/icons/calendar_active.png"),
             label: 'Calendar',
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings),
+            icon: Image.asset("assets/icons/settings_inactive.png"),
+            selectedIcon: Image.asset("assets/icons/settings_active.png"),
             label: 'Settings',
           ),
         ],

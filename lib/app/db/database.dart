@@ -104,8 +104,9 @@ class DatabaseHelper {
         // Create grocery_list table
         await db.execute('''
           CREATE TABLE grocery_list (
-            grocery_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            grocery_name TEXT CHECK(length(grocery_name) <= 20)
+            grocery_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            grocery_name TEXT CHECK(length(grocery_name) <= 20),
+            checked INTEGER
           )
         ''');
       },

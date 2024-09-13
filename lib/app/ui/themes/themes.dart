@@ -5,5 +5,5 @@ class Themes {
       appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent),
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       useMaterial3: true,
-      scaffoldBackgroundColor: const Color.fromARGB(237, 255, 255, 255));
+      scaffoldBackgroundColor: const Color.fromARGB(135, 250, 245, 245));
 }
