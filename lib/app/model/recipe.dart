@@ -1,4 +1,3 @@
-
 class Recipe {
   final int recipeId;
   final String imagePath;
@@ -8,7 +7,7 @@ class Recipe {
   final int minutes;
   final String directions;
   final String link;
-
+  List<String> tags;
   Recipe({
     required this.recipeId,
     required this.imagePath,
@@ -18,5 +17,6 @@ class Recipe {
     required this.minutes,
     required this.directions,
     required this.link,
+    this.tags = const [],
   });
 }

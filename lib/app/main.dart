@@ -4,6 +4,7 @@ import 'package:recipe_app/app/ui/views/calendar_view.dart';
 import 'package:recipe_app/app/ui/views/groceries_view.dart';
 import 'package:recipe_app/app/ui/views/recipes_view.dart';
 import 'package:recipe_app/app/ui/views/settings_view.dart';
+// Import your new recipe screen
 
 void main() {
   runApp(const MyApp());
@@ -12,14 +13,14 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Recipe App',
-        theme: Themes().themeData,
-        debugShowCheckedModeBanner: false,
-        home: const MainWrapper());
+      title: 'Recipe App',
+      theme: Themes().themeData,
+      debugShowCheckedModeBanner: false,
+      home: const MainWrapper(),
+    );
   }
 }
 
@@ -33,19 +34,22 @@ class MainWrapper extends StatefulWidget {
 
 class _MainWrapperState extends State<MainWrapper> {
   int selectedIndex = 0;
+  final ValueNotifier<void> _recipesNotifier =
+      ValueNotifier<void>(null); // ValueNotifier for recipes
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       /// Body
       body: Padding(
-          padding: const EdgeInsets.only(top: 40), // Main Container Padding
-          child: [
-            const RecipesView(),
-            const GroceriesView(),
-            const CalendarView(),
-            const SettingsView(),
-          ][selectedIndex]),
+        padding: const EdgeInsets.only(top: 40), // Main Container Padding
+        child: [
+          RecipesView(notifier: _recipesNotifier), // Pass the notifier
+          const GroceriesView(),
+          const CalendarView(),
+          const SettingsView(),
+        ][selectedIndex],
+      ),
 
       /// Bottom Nav Bar
       bottomNavigationBar: NavigationBar(

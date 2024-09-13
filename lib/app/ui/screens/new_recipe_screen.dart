@@ -4,7 +4,9 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class NewRecipeScreen extends StatefulWidget {
-  const NewRecipeScreen({super.key});
+  final VoidCallback onRecipeSaved;
+
+  const NewRecipeScreen({super.key, required this.onRecipeSaved});
 
   @override
   _NewRecipeScreenState createState() => _NewRecipeScreenState();
@@ -13,6 +15,7 @@ class NewRecipeScreen extends StatefulWidget {
 class _NewRecipeScreenState extends State<NewRecipeScreen>
     with SingleTickerProviderStateMixin {
   // Controllers
+  final _formKey = GlobalKey<FormState>(); // Key to manage form validation
   final TextEditingController _recipeNameController = TextEditingController();
   final TextEditingController _directionsController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -33,9 +36,10 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
 
   late final TabController _tabController;
 
-  // Ingredient controllers
+  // Ingredient controllers and focus nodes
   List<TextEditingController> _ingredientControllers =
       List.generate(4, (_) => TextEditingController());
+  List<FocusNode> _ingredientFocusNodes = List.generate(4, (_) => FocusNode());
 
   @override
   void initState() {
@@ -52,10 +56,14 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
     _tagController.dispose();
     _tabController.dispose();
 
-    // Dispose ingredient controllers
+    // Dispose ingredient controllers and focus nodes
     for (var controller in _ingredientControllers) {
       controller.dispose();
     }
+    for (var focusNode in _ingredientFocusNodes) {
+      focusNode.dispose();
+    }
+
     super.dispose();
   }
 
@@ -71,44 +79,59 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
   }
 
   Future<void> _saveRecipe() async {
-    try {
-      final int recipeId = await _recipeOperations.insertRecipe(
-        _recipeNameController.text,
-        _descriptionController.text,
-        _imagePath ?? '', // Ensure _imagePath is handled correctly
-        _selectedHour,
-        _selectedMinute,
-        _directionsController.text,
-        _linkController.text,
-      );
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        // Ensure tags are unique and have valid length
+        final uniqueTags =
+            _tags.toSet().where((tag) => tag.length <= 15).toList();
 
-      // Save ingredients
-      for (var controller in _ingredientControllers) {
-        String ingredient = controller.text;
-        if (ingredient.isNotEmpty) {
-          await _recipeOperations.addIngredientToRecipe(recipeId, ingredient);
+        final int recipeId = await _recipeOperations.insertRecipe(
+          _recipeNameController.text,
+          _descriptionController.text,
+          _imagePath ?? '',
+          _selectedHour,
+          _selectedMinute,
+          _directionsController.text,
+          _linkController.text,
+        );
+
+        print('Recipe ID: $recipeId');
+
+        for (var controller in _ingredientControllers) {
+          String ingredient = controller.text;
+          if (ingredient.isNotEmpty) {
+            print('Adding ingredient: $ingredient');
+            await _recipeOperations.addIngredientToRecipe(recipeId, ingredient);
+          }
         }
+
+        for (var tag in uniqueTags) {
+          print('Adding tag: $tag');
+          await _recipeOperations.addTagToRecipeIfNotExists(recipeId, tag);
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Recipe Saved Successfully')),
+        );
+        Navigator.pop(context); // Navigate back after saving
+        _resetIngredients();
+        widget.onRecipeSaved();
+      } catch (e) {
+        print('Error saving recipe: $e');
       }
-
-      // Save tags
-      for (String tag in _tags) {
-        await _recipeOperations.addTagToRecipe(recipeId, tag);
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Recipe Saved Successfully')),
-      );
-
-      _resetIngredients();
-    } catch (e) {
-      print('Error saving recipe: $e');
     }
   }
 
   void _resetIngredients() {
     setState(() {
-      _ingredientControllers.forEach((controller) => controller.dispose());
+      for (var controller in _ingredientControllers) {
+        controller.dispose();
+      }
+      for (var focusNode in _ingredientFocusNodes) {
+        focusNode.dispose();
+      }
       _ingredientControllers = List.generate(4, (_) => TextEditingController());
+      _ingredientFocusNodes = List.generate(4, (_) => FocusNode());
     });
   }
 
@@ -130,34 +153,19 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
             onPressed: _saveRecipe,
             icon: const Icon(Icons.check),
           ),
-          IconButton(onPressed: _testSQL, icon: const Icon(Icons.check))
         ],
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildRecipeTab(),
-          _buildDetailsTab(),
-        ],
+      body: Form(
+        key: _formKey,
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildRecipeTab(),
+            _buildDetailsTab(),
+          ],
+        ),
       ),
     );
-  }
-
-  Future<void> _testSQL() async {
-    try {
-      final int recipeId = await _recipeOperations.insertRecipe(
-          'test recipe', // Recipe name
-          'rsss', // Recipe description
-          'abcdefabcdefabcdefabcdefabcdef', // Image path
-          1, // Hours
-          19, // Minutes
-          'dsdsdsds', // Directions
-          'dsdsdsds' // Link
-          );
-      print('Test recipe inserted with ID: $recipeId');
-    } catch (e) {
-      print('Error inserting test recipe: $e');
-    }
   }
 
   Widget _buildRecipeTab() {
@@ -166,10 +174,21 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
       child: Column(
         children: [
           _buildImagePicker(),
-          _buildTextField(_recipeNameController, 'Recipe Name'),
+          _buildTextField(_recipeNameController, 'Recipe Name',
+              validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Recipe Name is required';
+            }
+            return null;
+          }),
           const SizedBox(height: 16),
           _buildTextField(_descriptionController, 'Recipe Description',
-              maxLines: 2),
+              maxLines: 2, validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Recipe Description is required';
+            }
+            return null;
+          }),
           const SizedBox(height: 16),
           _buildTagInputRow(),
           const SizedBox(height: 16),
@@ -197,7 +216,10 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: _buildTextField(
-                      _ingredientControllers[index], 'Ingredient ${index + 1}'),
+                    _ingredientControllers[index],
+                    'Ingredient ${index + 1}',
+                    focusNode: _ingredientFocusNodes[index],
+                  ),
                 );
               },
             ),
@@ -208,6 +230,7 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
             onPressed: () {
               setState(() {
                 _ingredientControllers.add(TextEditingController());
+                _ingredientFocusNodes.add(FocusNode());
               });
             },
             child: const Text('Add Ingredient'),
@@ -232,11 +255,17 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
   }
 
   Widget _buildTextField(TextEditingController controller, String labelText,
-      {int? maxLines}) {
-    return TextField(
+      {int? maxLines,
+      FocusNode? focusNode,
+      String? Function(String?)? validator}) {
+    return TextFormField(
       controller: controller,
-      decoration: InputDecoration(labelText: labelText),
+      decoration: InputDecoration(
+        labelText: labelText,
+      ),
       maxLines: maxLines,
+      focusNode: focusNode,
+      validator: validator,
     );
   }
 
@@ -251,7 +280,12 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
           onPressed: () {
             if (_tagController.text.isNotEmpty) {
               setState(() {
-                _tags.add(_tagController.text);
+                if (!_tags.contains(_tagController.text)) {
+                  _tags.add(_tagController.text);
+                  if (_selectedTag == null) {
+                    _selectedTag = _tagController.text;
+                  }
+                }
                 _tagController.clear();
               });
             }
@@ -260,8 +294,12 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
         ),
         const SizedBox(width: 8),
         DropdownButton<String>(
-          value: _selectedTag,
-          hint: const Text('Tags'),
+          value: _tags.isNotEmpty
+              ? _selectedTag
+              : _tags.isEmpty
+                  ? null
+                  : _tags.first,
+          hint: const Text('Select Tag'),
           onChanged: (String? newValue) {
             setState(() {
               _selectedTag = newValue;
@@ -282,33 +320,44 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        DropdownButton<int>(
-          value: _selectedHour,
-          onChanged: (int? newValue) {
-            setState(() {
-              _selectedHour = newValue!;
-            });
-          },
-          items: _hours.map<DropdownMenuItem<int>>((int value) {
-            return DropdownMenuItem<int>(
-              value: value,
-              child: Text('$value Hours'),
-            );
-          }).toList(),
+        Expanded(
+          child: DropdownButtonFormField<int>(
+            value: _selectedHour,
+            items: _hours.map<DropdownMenuItem<int>>((int hour) {
+              return DropdownMenuItem<int>(
+                value: hour,
+                child: Text(hour.toString().padLeft(2, '0')),
+              );
+            }).toList(),
+            onChanged: (int? newValue) {
+              setState(() {
+                _selectedHour = newValue ?? 0;
+              });
+            },
+            decoration: const InputDecoration(
+              labelText: 'Hours',
+            ),
+          ),
         ),
-        DropdownButton<int>(
-          value: _selectedMinute,
-          onChanged: (int? newValue) {
-            setState(() {
-              _selectedMinute = newValue!;
-            });
-          },
-          items: _minutes.map<DropdownMenuItem<int>>((int value) {
-            return DropdownMenuItem<int>(
-              value: value,
-              child: Text('$value Minutes'),
-            );
-          }).toList(),
+        const SizedBox(width: 16),
+        Expanded(
+          child: DropdownButtonFormField<int>(
+            value: _selectedMinute,
+            items: _minutes.map<DropdownMenuItem<int>>((int minute) {
+              return DropdownMenuItem<int>(
+                value: minute,
+                child: Text(minute.toString().padLeft(2, '0')),
+              );
+            }).toList(),
+            onChanged: (int? newValue) {
+              setState(() {
+                _selectedMinute = newValue ?? 0;
+              });
+            },
+            decoration: const InputDecoration(
+              labelText: 'Minutes',
+            ),
+          ),
         ),
       ],
     );

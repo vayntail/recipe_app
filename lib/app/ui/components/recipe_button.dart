@@ -1,21 +1,32 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:recipe_app/app/model/recipe.dart';
+import 'package:recipe_app/app/db/recipedb_operations.dart';
 
-class RecipeButton extends StatelessWidget {
+class RecipeButton extends StatefulWidget {
+  final Recipe recipe;
+  final VoidCallback onDelete; // Callback for deletion
+
   const RecipeButton({
     super.key,
-    required this.recipe
+    required this.recipe,
+    required this.onDelete,
   });
 
-  final Recipe recipe;
+  @override
+  _RecipeButtonState createState() => _RecipeButtonState();
+}
+
+class _RecipeButtonState extends State<RecipeButton> {
+  bool _showDeleteOption = false;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // Handle tap on the card
+      onLongPress: () {
+        setState(() {
+          _showDeleteOption = true;
+        });
       },
       child: Card(
         shape: RoundedRectangleBorder(
@@ -25,59 +36,91 @@ class RecipeButton extends StatelessWidget {
             width: 1,
           ),
         ),
-        child: Container(
-          color: Colors.white,
-          height: 115,
-          padding:
-              const EdgeInsets.only(bottom: 8, top: 8, left: 15, right: 15),
-          child: Row(
-            children: [
-              /// Picture Image
-              Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  image: recipe.imagePath.isNotEmpty
-                      ? DecorationImage(
-                          image: FileImage(
-                              File(recipe.imagePath)), // Load image from file path
-                          fit: BoxFit.cover,
-                        )
-                      : null,
+        child: Stack(
+          children: [
+            Container(
+              color: Colors.white,
+              height: 115,
+              padding:
+                  const EdgeInsets.only(bottom: 8, top: 8, left: 15, right: 15),
+              child: Row(
+                children: [
+                  Container(
+                    height: 100,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      image: widget.recipe.imagePath.isNotEmpty
+                          ? DecorationImage(
+                              image: FileImage(File(widget.recipe.imagePath)),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.recipe.recipeName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(
+                          widget.recipe.recipeDescription,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Wrap(
+                          children: widget.recipe.tags
+                              .map((tag) => Chip(label: Text(tag)))
+                              .toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (_showDeleteOption)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: _deleteRecipe,
+                  child: Container(
+                    color: Colors.red,
+                    padding: const EdgeInsets.all(8.0),
+                    child: const Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
-
-              // /// Horizontal Spacer
-              const SizedBox(width: 20),
-
-              /// Name + Description Texts
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      recipe.recipeName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      recipe.recipeDescription,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-
-              /// Time Text
-              // Text("${recipe.minutes} min."),
-            ],
-          ),
+          ],
         ),
       ),
     );
+  }
+
+  Future<void> _deleteRecipe() async {
+    final RecipeOperations recipeOperations = RecipeOperations();
+
+    await recipeOperations.deleteRecipe(widget.recipe.recipeId);
+    await recipeOperations.deleteSingleTags();
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Recipe deleted')),
+    );
+
+    // Call the onDelete callback to refresh the list
+    widget.onDelete();
   }
 }

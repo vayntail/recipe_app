@@ -84,9 +84,9 @@ class DatabaseHelper {
           CREATE TABLE recipe_tag (
             recipe_id INTEGER,
             tag_id INTEGER,
-            PRIMARY KEY (recipe_id, tag_id),
-            FOREIGN KEY (recipe_id) REFERENCES recipes (recipe_id),
-            FOREIGN KEY (tag_id) REFERENCES tag (tag_id)
+            FOREIGN KEY (recipe_id) REFERENCES recipes (recipe_id) ON DELETE CASCADE,
+            FOREIGN KEY (tag_id) REFERENCES tag (tag_id) ON DELETE CASCADE,
+            PRIMARY KEY (recipe_id, tag_id)
           )
         ''');
 
