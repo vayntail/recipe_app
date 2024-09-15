@@ -19,4 +19,9 @@ class Recipe {
     required this.link,
     this.tags = const [],
   });
+
+  @override
+  String toString() {
+    return 'Recipe{id: $recipeId, name: $recipeName}';
+  }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:recipe_app/app/ui/themes/themes.dart';
+import 'package:recipe_app/app/ui/themes/theme_controller.dart';
 import 'package:recipe_app/app/ui/views/calendar_view.dart';
 import 'package:recipe_app/app/ui/views/groceries_view.dart';
 import 'package:recipe_app/app/ui/views/recipes_view.dart';
@@ -11,13 +11,18 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+
+    // Set theme
+  ThemeController().themeOne();
+
     return MaterialApp(
       title: 'Recipe App',
-      theme: Themes().themeData,
+      theme: ThemeController().themeData,
       debugShowCheckedModeBanner: false,
       home: const MainWrapper(),
     );

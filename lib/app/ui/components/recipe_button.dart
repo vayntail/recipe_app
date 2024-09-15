@@ -2,15 +2,22 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:recipe_app/app/model/recipe.dart';
 import 'package:recipe_app/app/db/recipedb_operations.dart';
+import 'package:recipe_app/app/ui/widgets/recipe_button_widget.dart';
 
 class RecipeButton extends StatefulWidget {
+  final bool isMealSelection;
   final Recipe recipe;
   final VoidCallback onDelete; // Callback for deletion
+  final Function? addToSelectedMeals;
+  final Function? removeFromSelectedMeals;
 
   const RecipeButton({
     super.key,
+    required this.isMealSelection,
     required this.recipe,
     required this.onDelete,
+    this.addToSelectedMeals,
+    this.removeFromSelectedMeals
   });
 
   @override
@@ -19,10 +26,41 @@ class RecipeButton extends StatefulWidget {
 
 class _RecipeButtonState extends State<RecipeButton> {
   bool _showDeleteOption = false;
+  bool? mealButtonChecked = false;
+
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    
+    // MealButton
+    if (widget.isMealSelection){
+      return Row(
+      children: [
+        Checkbox(
+          value: mealButtonChecked, 
+          onChanged: (bool? value){
+            setState(() {
+              debugPrint(mealButtonChecked.toString());
+              mealButtonChecked = value!;
+              // Add or Remove to selected meals list
+              if (mealButtonChecked==true){
+                widget.addToSelectedMeals!(widget.recipe);
+              }
+              else {
+                widget.removeFromSelectedMeals!(widget.recipe);
+              }
+            });
+          }
+        ),
+        Expanded(
+          child: recipeButtonWidget(widget.recipe, true),
+        )
+      ]
+    );
+    }
+    else {
+      // Home Recipes Button
+      return GestureDetector(
       onLongPress: () {
         setState(() {
           _showDeleteOption = true;
@@ -106,6 +144,7 @@ class _RecipeButtonState extends State<RecipeButton> {
         ),
       ),
     );
+    }
   }
 
   Future<void> _deleteRecipe() async {

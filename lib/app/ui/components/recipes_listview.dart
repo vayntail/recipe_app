@@ -4,11 +4,17 @@ import 'package:recipe_app/app/db/recipedb_operations.dart';
 import 'recipe_button.dart';
 
 class RecipesListView extends StatefulWidget {
-  final ValueNotifier<void> notifier;
+  final bool isMealSelection;
+  final ValueNotifier<void>? notifier;
+  final Function? addToSelectedMeals;
+  final Function? removeFromSelectedMeals;
 
   const RecipesListView({
     super.key,
-    required this.notifier,
+    required this.isMealSelection,
+    this.addToSelectedMeals,
+    this.removeFromSelectedMeals,
+    this.notifier,
   });
 
   @override
@@ -27,12 +33,12 @@ class _RecipesListViewState extends State<RecipesListView> {
     _fetchRecipes(); // Initialize the Future
     _loadTags();
     widget.notifier
-        .addListener(_onNotifierChanged); // Listen for notifier changes
+        ?.addListener(_onNotifierChanged); // Listen for notifier changes
   }
 
   @override
   void dispose() {
-    widget.notifier.removeListener(_onNotifierChanged); // Clean up listener
+    widget.notifier?.removeListener(_onNotifierChanged); // Clean up listener
     _tagsNotifier.dispose();
     super.dispose();
   }
@@ -98,7 +104,7 @@ class _RecipesListViewState extends State<RecipesListView> {
                 _searchQuery = query;
               });
               // Trigger a refresh of the recipe list
-              widget.notifier.notifyListeners();
+              widget.notifier?.notifyListeners();
             },
           ),
         ),
@@ -120,7 +126,7 @@ class _RecipesListViewState extends State<RecipesListView> {
                           _searchQuery = isSelected ? tag : '';
                         });
                         // Trigger a refresh of the recipe list
-                        widget.notifier.notifyListeners();
+                        widget.notifier?.notifyListeners();
                       },
                     ),
                   );
@@ -145,11 +151,14 @@ class _RecipesListViewState extends State<RecipesListView> {
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     return RecipeButton(
+                      addToSelectedMeals: widget.addToSelectedMeals,
+                      removeFromSelectedMeals: widget.removeFromSelectedMeals,
+                      isMealSelection: widget.isMealSelection,
                       recipe: snapshot.data![index],
                       onDelete: () {
                         _fetchRecipes(); // Refresh the list on delete
                         widget.notifier
-                            .notifyListeners(); // Ensure tag list is updated
+                            ?.notifyListeners(); // Ensure tag list is updated
                       },
                     );
                   },
