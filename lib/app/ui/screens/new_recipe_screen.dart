@@ -282,9 +282,7 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
               setState(() {
                 if (!_tags.contains(_tagController.text)) {
                   _tags.add(_tagController.text);
-                  if (_selectedTag == null) {
-                    _selectedTag = _tagController.text;
-                  }
+                  _selectedTag ??= _tagController.text;
                 }
                 _tagController.clear();
               });

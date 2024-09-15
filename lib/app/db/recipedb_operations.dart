@@ -1,4 +1,3 @@
-import 'package:recipe_app/app/model/grocery_item.dart';
 import 'package:recipe_app/app/model/recipe.dart';
 import 'package:sqflite/sqflite.dart';
 import 'database.dart';
