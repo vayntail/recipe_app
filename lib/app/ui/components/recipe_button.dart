@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:recipe_app/app/model/recipe.dart';
 import 'package:recipe_app/app/db/recipedb_operations.dart';
+import 'package:recipe_app/app/ui/screens/recipe_profile.dart';
 
 class RecipeButton extends StatefulWidget {
   final Recipe recipe;
@@ -23,6 +24,15 @@ class _RecipeButtonState extends State<RecipeButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      // Navigate to the recipe profile page.
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RecipeDetailsScreen(recipe: widget.recipe),
+          ),
+        );
+      },
       onLongPress: () {
         setState(() {
           _showDeleteOption = true;
@@ -50,13 +60,26 @@ class _RecipeButtonState extends State<RecipeButton> {
                     width: 100,
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
-                      image: widget.recipe.imagePath.isNotEmpty
+                      image: widget.recipe.imagePath.isNotEmpty &&
+                              File(widget.recipe.imagePath).existsSync()
                           ? DecorationImage(
                               image: FileImage(File(widget.recipe.imagePath)),
                               fit: BoxFit.cover,
                             )
-                          : null,
+                          : null, // No image
                     ),
+                    child: widget.recipe.imagePath.isEmpty ||
+                            !File(widget.recipe.imagePath).existsSync()
+                        ? Center(
+                            child: Text(
+                              'No Image',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                            ),
+                          )
+                        : null,
                   ),
                   const SizedBox(width: 20),
                   Expanded(

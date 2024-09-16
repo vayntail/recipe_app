@@ -5,8 +5,10 @@ import 'dart:io';
 
 class NewRecipeScreen extends StatefulWidget {
   final VoidCallback onRecipeSaved;
+  final int? recipeId; // Optional parameter to handle recipe updates
 
-  const NewRecipeScreen({super.key, required this.onRecipeSaved});
+  const NewRecipeScreen(
+      {super.key, required this.onRecipeSaved, this.recipeId});
 
   @override
   _NewRecipeScreenState createState() => _NewRecipeScreenState();
@@ -45,6 +47,11 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+
+    // Load recipe data if recipeId is provided
+    if (widget.recipeId != null) {
+      _loadRecipeData(widget.recipeId!);
+    }
   }
 
   @override
@@ -81,33 +88,49 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
   Future<void> _saveRecipe() async {
     if (_formKey.currentState?.validate() ?? false) {
       try {
-        // Ensure tags are unique and have valid length
         final uniqueTags =
             _tags.toSet().where((tag) => tag.length <= 15).toList();
+        if (widget.recipeId != null) {
+          // Update existing recipe
+          await _recipeOperations.updateRecipe(
+            widget.recipeId!,
+            _recipeNameController.text,
+            _descriptionController.text,
+            _imagePath ?? '',
+            _selectedHour,
+            _selectedMinute,
+            _directionsController.text,
+            _linkController.text,
+            uniqueTags,
+            _ingredientControllers.map((e) => e.text).toList(),
+          );
+        } else {
+          // Insert new recipe
+          final int recipeId = await _recipeOperations.insertRecipe(
+            _recipeNameController.text,
+            _descriptionController.text,
+            _imagePath ?? '',
+            _selectedHour,
+            _selectedMinute,
+            _directionsController.text,
+            _linkController.text,
+          );
 
-        final int recipeId = await _recipeOperations.insertRecipe(
-          _recipeNameController.text,
-          _descriptionController.text,
-          _imagePath ?? '',
-          _selectedHour,
-          _selectedMinute,
-          _directionsController.text,
-          _linkController.text,
-        );
+          print('Recipe ID: $recipeId');
 
-        print('Recipe ID: $recipeId');
-
-        for (var controller in _ingredientControllers) {
-          String ingredient = controller.text;
-          if (ingredient.isNotEmpty) {
-            print('Adding ingredient: $ingredient');
-            await _recipeOperations.addIngredientToRecipe(recipeId, ingredient);
+          for (var controller in _ingredientControllers) {
+            String ingredient = controller.text;
+            if (ingredient.isNotEmpty) {
+              print('Adding ingredient: $ingredient');
+              await _recipeOperations.addIngredientToRecipe(
+                  recipeId, ingredient);
+            }
           }
-        }
 
-        for (var tag in uniqueTags) {
-          print('Adding tag: $tag');
-          await _recipeOperations.addTagToRecipeIfNotExists(recipeId, tag);
+          for (var tag in uniqueTags) {
+            print('Adding tag: $tag');
+            await _recipeOperations.addTagToRecipeIfNotExists(recipeId, tag);
+          }
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -135,12 +158,66 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
     });
   }
 
+  Future<void> _loadRecipeData(int recipeId) async {
+    try {
+      final recipes = await _recipeOperations.getRecipes();
+      final recipe = recipes.firstWhere((r) => r.recipeId == recipeId);
+
+      final tags = recipe.tags ?? [];
+      final ingredients = recipe.ingredients ?? [];
+
+      setState(() {
+        _recipeNameController.text = recipe.recipeName;
+        _descriptionController.text = recipe.recipeDescription;
+        _imagePath = recipe.imagePath;
+        if (_imagePath == '') _imagePath = null;
+        _selectedHour = recipe.hours;
+        _selectedMinute = recipe.minutes;
+        _directionsController.text = recipe.directions;
+        _linkController.text = recipe.link;
+
+        _tags.clear();
+        _tags.addAll(tags);
+
+        _ingredientControllers = List.generate(
+          ingredients.length,
+          (index) => TextEditingController(text: ingredients[index]),
+        );
+      });
+    } catch (e) {
+      print('Error loading recipe data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error loading recipe data')),
+      );
+    }
+  }
+
+  void _addTag() {
+    final tag = _tagController.text.trim();
+    if (tag.isNotEmpty && !_tags.contains(tag)) {
+      setState(() {
+        _tags.add(tag);
+        _tagController.clear();
+        _selectedTag = null; // Reset selected tag
+      });
+    }
+  }
+
+  void _removeTag(String tag) {
+    setState(() {
+      _tags.remove(tag);
+      if (_selectedTag == tag) {
+        _selectedTag = null; // Clear selected tag if it's removed
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: const Text('New Recipe'),
+        title: Text(widget.recipeId != null ? 'Edit Recipe' : 'New Recipe'),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -192,9 +269,10 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
           const SizedBox(height: 16),
           _buildTagInputRow(),
           const SizedBox(height: 16),
+          _buildTagDropdown(), // Add dropdown here
+          const SizedBox(height: 16),
           _buildTimePickers(),
           _buildTextField(_linkController, 'Add Your Favourite Link'),
-          const SizedBox(height: 16),
         ],
       ),
     );
@@ -225,7 +303,6 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
             ),
           ),
           const SizedBox(height: 16),
-
           ElevatedButton(
             onPressed: () {
               setState(() {
@@ -243,29 +320,38 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
   Widget _buildImagePicker() {
     return GestureDetector(
       onTap: _pickImage,
-      child: Container(
-        height: 200,
-        width: double.infinity,
-        color: Colors.grey[300],
-        child: _imagePath != null
-            ? Image.file(File(_imagePath!))
-            : const Center(child: Text('Tap to select an image')),
-      ),
+      child: _imagePath != null
+          ? Image.file(
+              File(_imagePath!),
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: 200,
+            )
+          : Container(
+              color: const Color.fromARGB(255, 255, 255, 255),
+              width: double.infinity,
+              height: 200,
+              child: Center(child: Text('Tap to select image')),
+            ),
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String labelText,
-      {int? maxLines,
-      FocusNode? focusNode,
-      String? Function(String?)? validator}) {
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint, {
+    int maxLines = 1,
+    String? Function(String?)? validator,
+    FocusNode? focusNode,
+  }) {
     return TextFormField(
       controller: controller,
-      decoration: InputDecoration(
-        labelText: labelText,
-      ),
       maxLines: maxLines,
-      focusNode: focusNode,
+      decoration: InputDecoration(
+        hintText: hint,
+        border: OutlineInputBorder(),
+      ),
       validator: validator,
+      focusNode: focusNode,
     );
   }
 
@@ -273,67 +359,68 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
     return Row(
       children: [
         Expanded(
-          child: _buildTextField(_tagController, 'Tag Name'),
+          child: TextFormField(
+            controller: _tagController,
+            decoration: const InputDecoration(
+              hintText: 'Add Tag',
+              border: OutlineInputBorder(),
+            ),
+          ),
         ),
-        const SizedBox(width: 8),
-        ElevatedButton(
-          onPressed: () {
-            if (_tagController.text.isNotEmpty) {
-              setState(() {
-                if (!_tags.contains(_tagController.text)) {
-                  _tags.add(_tagController.text);
-                  _selectedTag ??= _tagController.text;
-                }
-                _tagController.clear();
-              });
-            }
-          },
-          child: const Text('Add Tag'),
+        IconButton(
+          onPressed: _addTag,
+          icon: const Icon(Icons.add),
         ),
-        const SizedBox(width: 8),
-        DropdownButton<String>(
-          value: _tags.isNotEmpty
-              ? _selectedTag
-              : _tags.isEmpty
-                  ? null
-                  : _tags.first,
-          hint: const Text('Select Tag'),
-          onChanged: (String? newValue) {
-            setState(() {
-              _selectedTag = newValue;
-            });
-          },
-          items: _tags.map<DropdownMenuItem<String>>((String tag) {
-            return DropdownMenuItem<String>(
-              value: tag,
-              child: Text(tag),
-            );
-          }).toList(),
+        IconButton(
+          onPressed:
+              _selectedTag != null ? () => _removeTag(_selectedTag!) : null,
+          icon: const Icon(Icons.remove),
         ),
       ],
     );
   }
 
+  Widget _buildTagDropdown() {
+    return DropdownButtonFormField<String>(
+      value: _selectedTag,
+      items: _tags
+          .map((tag) => DropdownMenuItem<String>(
+                value: tag,
+                child: Text(tag),
+              ))
+          .toList(),
+      onChanged: (value) {
+        setState(() {
+          _selectedTag = value;
+        });
+      },
+      decoration: const InputDecoration(
+        labelText: 'Select Tag',
+        border: OutlineInputBorder(),
+      ),
+    );
+  }
+
   Widget _buildTimePickers() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
           child: DropdownButtonFormField<int>(
             value: _selectedHour,
-            items: _hours.map<DropdownMenuItem<int>>((int hour) {
-              return DropdownMenuItem<int>(
-                value: hour,
-                child: Text(hour.toString().padLeft(2, '0')),
-              );
-            }).toList(),
-            onChanged: (int? newValue) {
+            items: _hours
+                .map((hour) => DropdownMenuItem<int>(
+                      value: hour,
+                      child: Text(hour.toString().padLeft(2, '0')),
+                    ))
+                .toList(),
+            onChanged: (value) {
               setState(() {
-                _selectedHour = newValue ?? 0;
+                _selectedHour = value ?? 0;
               });
             },
             decoration: const InputDecoration(
               labelText: 'Hours',
+              border: OutlineInputBorder(),
             ),
           ),
         ),
@@ -341,19 +428,20 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
         Expanded(
           child: DropdownButtonFormField<int>(
             value: _selectedMinute,
-            items: _minutes.map<DropdownMenuItem<int>>((int minute) {
-              return DropdownMenuItem<int>(
-                value: minute,
-                child: Text(minute.toString().padLeft(2, '0')),
-              );
-            }).toList(),
-            onChanged: (int? newValue) {
+            items: _minutes
+                .map((minute) => DropdownMenuItem<int>(
+                      value: minute,
+                      child: Text(minute.toString().padLeft(2, '0')),
+                    ))
+                .toList(),
+            onChanged: (value) {
               setState(() {
-                _selectedMinute = newValue ?? 0;
+                _selectedMinute = value ?? 0;
               });
             },
             decoration: const InputDecoration(
               labelText: 'Minutes',
+              border: OutlineInputBorder(),
             ),
           ),
         ),

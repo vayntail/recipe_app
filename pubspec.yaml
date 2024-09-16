@@ -39,6 +39,8 @@ flutter:
     - assets/imgs/chili-img.jpeg
     - assets/imgs/kimbap-img.jpg
     - assets/imgs/sandwich-img.jpg
+    - assets/imgs/default_image.png
+
     
 
   # An image asset can refer to one or more resolution-specific "variants", see

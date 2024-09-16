@@ -60,13 +60,18 @@ class _RecipesListViewState extends State<RecipesListView> {
   }
 
   Future<List<Recipe>> _getRecipes() async {
+    // Fetch the list of recipes
     List<Recipe> recipesList = await _recipeOperations.getRecipes();
 
+    // Update each recipe with its associated tags
     for (var recipe in recipesList) {
+      // Fetch tags for the recipe
       final tags = await _recipeOperations.getTagsForRecipe(recipe.recipeId);
-      recipe.tags = tags.map((tag) => tag['tag_name'] as String).toList();
+      // Set the tags for the recipe
+      recipe.tags = tags;
     }
 
+    // Filter recipes based on the search query if it's not empty
     if (_searchQuery.isNotEmpty) {
       recipesList = recipesList.where((recipe) {
         final nameMatch = recipe.recipeName
