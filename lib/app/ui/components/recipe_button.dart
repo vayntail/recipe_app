@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:recipe_app/app/model/recipe.dart';
 import 'package:recipe_app/app/db/recipedb_operations.dart';
+import 'package:recipe_app/app/ui/screens/recipe_profile.dart';
 
 class RecipeButton extends StatefulWidget {
   final bool isMealSelection;
@@ -16,7 +17,7 @@ class RecipeButton extends StatefulWidget {
     required this.recipe,
     required this.onDelete,
     this.addToSelectedMeals,
-    this.removeFromSelectedMeals
+    this.removeFromSelectedMeals,
   });
 
   @override
@@ -27,14 +28,25 @@ class _RecipeButtonState extends State<RecipeButton> {
   bool _showDeleteOption = false;
   bool? mealButtonChecked = false;
 
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: () {
+        if (!widget.isMealSelection) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RecipeDetailsScreen(recipe: widget.recipe),
+            ),
+          );
+        }
+      },
       onLongPress: () {
-        setState(() {
-          _showDeleteOption = true;
-        });
+        if (!widget.isMealSelection) {
+          setState(() {
+            _showDeleteOption = true;
+          });
+        }
       },
       child: Card(
         shape: RoundedRectangleBorder(
@@ -123,11 +135,28 @@ class _RecipeButtonState extends State<RecipeButton> {
                   ),
                 ),
               ),
+            if (widget.isMealSelection)
+              Positioned(
+                bottom: 8,
+                right: 8,
+                child: Checkbox(
+                  value: mealButtonChecked,
+                  onChanged: (value) {
+                    setState(() {
+                      mealButtonChecked = value;
+                      if (value == true) {
+                        widget.addToSelectedMeals?.call(widget.recipe);
+                      } else {
+                        widget.removeFromSelectedMeals?.call(widget.recipe);
+                      }
+                    });
+                  },
+                ),
+              ),
           ],
         ),
       ),
     );
-    }
   }
 
   Future<void> _deleteRecipe() async {

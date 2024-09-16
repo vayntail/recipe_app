@@ -331,7 +331,7 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
               color: const Color.fromARGB(255, 255, 255, 255),
               width: double.infinity,
               height: 200,
-              child: Center(child: Text('Tap to select image')),
+              child: const Center(child: Text('Tap to select image')),
             ),
     );
   }
@@ -348,7 +348,7 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
       maxLines: maxLines,
       decoration: InputDecoration(
         hintText: hint,
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
       ),
       validator: validator,
       focusNode: focusNode,

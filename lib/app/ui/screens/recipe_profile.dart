@@ -6,7 +6,7 @@ import 'dart:io';
 class RecipeDetailsScreen extends StatelessWidget {
   final Recipe recipe;
 
-  const RecipeDetailsScreen({Key? key, required this.recipe}) : super(key: key);
+  const RecipeDetailsScreen({super.key, required this.recipe});
 
   @override
   Widget build(BuildContext context) {
