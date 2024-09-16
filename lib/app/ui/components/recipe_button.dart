@@ -2,16 +2,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:recipe_app/app/model/recipe.dart';
 import 'package:recipe_app/app/db/recipedb_operations.dart';
-import 'package:recipe_app/app/ui/screens/recipe_profile.dart';
 
 class RecipeButton extends StatefulWidget {
+  final bool isMealSelection;
   final Recipe recipe;
   final VoidCallback onDelete; // Callback for deletion
+  final Function? addToSelectedMeals;
+  final Function? removeFromSelectedMeals;
 
   const RecipeButton({
     super.key,
+    required this.isMealSelection,
     required this.recipe,
     required this.onDelete,
+    this.addToSelectedMeals,
+    this.removeFromSelectedMeals
   });
 
   @override
@@ -20,19 +25,12 @@ class RecipeButton extends StatefulWidget {
 
 class _RecipeButtonState extends State<RecipeButton> {
   bool _showDeleteOption = false;
+  bool? mealButtonChecked = false;
+
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // Navigate to the recipe profile page.
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RecipeDetailsScreen(recipe: widget.recipe),
-          ),
-        );
-      },
       onLongPress: () {
         setState(() {
           _showDeleteOption = true;
@@ -129,6 +127,7 @@ class _RecipeButtonState extends State<RecipeButton> {
         ),
       ),
     );
+    }
   }
 
   Future<void> _deleteRecipe() async {

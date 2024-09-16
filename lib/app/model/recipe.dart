@@ -22,4 +22,9 @@ class Recipe {
     required this.link,
     this.tags = const [], // Default to empty list if not provided
   });
+
+  @override
+  String toString() {
+    return 'Recipe{id: $recipeId, name: $recipeName}';
+  }
 }

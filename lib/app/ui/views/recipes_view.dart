@@ -37,6 +37,7 @@ class _RecipesViewState extends State<RecipesView> {
         ],
       ),
       body: RecipesListView(
+        isMealSelection: false,
         notifier: widget.notifier,
       ),
     );
