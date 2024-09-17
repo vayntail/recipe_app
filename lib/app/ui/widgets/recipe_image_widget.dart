@@ -9,13 +9,23 @@ Widget recipeImageWidget(String imagePath, double? height) {
     width: height,
     decoration: BoxDecoration(
       color: Colors.grey[200],
-      image: imagePath.isNotEmpty
+      image: imagePath.isNotEmpty && File(imagePath).existsSync()
           ? DecorationImage(
-
               image: FileImage(File(imagePath)),
               fit: BoxFit.cover,
             )
-          : null,
+          : null, // No image
     ),
+    child: imagePath.isEmpty || !File(imagePath).existsSync()
+        ? Center(
+            child: Text(
+              'No Image',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            ),
+          )
+        : null,
   );
 }

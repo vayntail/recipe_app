@@ -47,7 +47,7 @@ class DatabaseHelper {
         await db.execute('''
           CREATE TABLE meal (
             meal_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            meal_type TEXT CHECK(meal_type IN ('Breakfast', 'Lunch', 'Dinner', 'Snack')),
+            meal_type INTEGER,
             recipe_id INTEGER,
             FOREIGN KEY (recipe_id) REFERENCES recipes (recipe_id)
           )
@@ -87,17 +87,6 @@ class DatabaseHelper {
             FOREIGN KEY (recipe_id) REFERENCES recipes (recipe_id) ON DELETE CASCADE,
             FOREIGN KEY (tag_id) REFERENCES tag (tag_id) ON DELETE CASCADE,
             PRIMARY KEY (recipe_id, tag_id)
-          )
-        ''');
-
-        // Create calendar_meal table
-        await db.execute('''
-          CREATE TABLE calendar_meal (
-            calendar_id INTEGER,
-            meal_id INTEGER,
-            PRIMARY KEY (calendar_id, meal_id),
-            FOREIGN KEY (calendar_id) REFERENCES calendar (calendar_id),
-            FOREIGN KEY (meal_id) REFERENCES meal (meal_id)
           )
         ''');
 

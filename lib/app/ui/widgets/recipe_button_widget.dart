@@ -11,6 +11,10 @@ Widget recipeButtonWidget(Recipe recipe, bool mealButton) {
     height = 100;
     imgHeight = 80;
   }
+  else {
+    height = 120;
+    imgHeight = 100;
+  }
   return Container(
       // Container THEME!!
       decoration: BoxDecoration(

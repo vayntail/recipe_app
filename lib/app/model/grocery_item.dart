@@ -28,6 +28,4 @@ class GroceryItem {
   String toString() {
     return 'GroceryItem{id: $id, name: $name, checked: $checked}';
   }
-
-  // Update information
 }

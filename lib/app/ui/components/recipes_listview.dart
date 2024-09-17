@@ -8,13 +8,15 @@ class RecipesListView extends StatefulWidget {
   final ValueNotifier<void>? notifier;
   final Function? addToSelectedMeals;
   final Function? removeFromSelectedMeals;
+  final Function? checkIfInSelectedMeals;
 
   const RecipesListView({
     super.key,
     required this.isMealSelection,
     this.addToSelectedMeals,
     this.removeFromSelectedMeals,
-    this.notifier,
+    this.notifier, 
+    this.checkIfInSelectedMeals,
   });
 
   @override
@@ -158,6 +160,7 @@ class _RecipesListViewState extends State<RecipesListView> {
                     return RecipeButton(
                       addToSelectedMeals: widget.addToSelectedMeals,
                       removeFromSelectedMeals: widget.removeFromSelectedMeals,
+                      checkIfInSelectedMeals: widget.checkIfInSelectedMeals,
                       isMealSelection: widget.isMealSelection,
                       recipe: snapshot.data![index],
                       onDelete: () {

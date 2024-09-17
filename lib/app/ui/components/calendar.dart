@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class Calendar extends StatefulWidget {
-  final CalendarFormat calendarFormat;
-
-  const Calendar({super.key, required this.calendarFormat});
+  final CalendarFormat format;
+  final Function setSelectedDay;
+  const Calendar({super.key, required this.format, required this.setSelectedDay});
 
   @override
   State<Calendar> createState() => _CalendarState();
@@ -16,11 +16,16 @@ class _CalendarState extends State<Calendar> {
 
   @override
   Widget build(BuildContext context) {
+    // Set first accessible day (Need to change later)
+    DateTime firstAccessibleDay = DateTime.utc(2024, 09, 8);
+    // Set last accessible day, set to current day for now
+    DateTime lastAccessibleDay = DateTime.now();
+
     return TableCalendar(
       focusedDay: _focusedDay,
-      firstDay: DateTime.utc(2024, 09, 8), // First accessible day
-      lastDay: DateTime.utc(2024, 09, 14), // Last accessible day
-      calendarFormat: widget.calendarFormat, // Show as a week view
+      firstDay: firstAccessibleDay,
+      lastDay: lastAccessibleDay,
+      calendarFormat: widget.format, // View swapper (month or week)
       startingDayOfWeek: StartingDayOfWeek.sunday, // Start week from Sunday
       headerVisible: false, // Remove top month header
       selectedDayPredicate: (day) {
@@ -31,11 +36,9 @@ class _CalendarState extends State<Calendar> {
           setState(() {
             _selectedDay = selectedDay;
             _focusedDay = focusedDay;
+            widget.setSelectedDay(_focusedDay);
           });
         }
-      },
-      onPageChanged: (focusedDay) {
-        _focusedDay = focusedDay;
       },
     );
   }

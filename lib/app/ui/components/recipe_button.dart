@@ -3,21 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:recipe_app/app/model/recipe.dart';
 import 'package:recipe_app/app/db/recipedb_operations.dart';
 import 'package:recipe_app/app/ui/screens/recipe_profile.dart';
+import 'package:recipe_app/app/ui/widgets/recipe_button_widget.dart';
 
 class RecipeButton extends StatefulWidget {
   final bool isMealSelection;
   final Recipe recipe;
-  final VoidCallback onDelete; // Callback for deletion
+  final VoidCallback? onDelete; // Callback for deletion
   final Function? addToSelectedMeals;
   final Function? removeFromSelectedMeals;
+  final Function? checkIfInSelectedMeals; // Used to check if a recipe is already selected or not, for displaying checkmark
 
   const RecipeButton({
     super.key,
     required this.isMealSelection,
     required this.recipe,
-    required this.onDelete,
+    this.onDelete,
     this.addToSelectedMeals,
     this.removeFromSelectedMeals,
+    this.checkIfInSelectedMeals
   });
 
   @override
@@ -28,25 +31,56 @@ class _RecipeButtonState extends State<RecipeButton> {
   bool _showDeleteOption = false;
   bool? mealButtonChecked = false;
 
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (!widget.isMealSelection) {
+
+    
+    // MealButton
+    if (widget.isMealSelection){
+      mealButtonChecked = widget.checkIfInSelectedMeals!(widget.recipe);
+
+      return Row(
+      children: [
+        Checkbox(
+          value: mealButtonChecked, 
+          onChanged: (bool? value){
+            setState(() {
+              mealButtonChecked = value!;
+              // Add or Remove to selected meals list
+              if (mealButtonChecked==true){
+                widget.addToSelectedMeals!(widget.recipe);
+              }
+              else {
+                widget.removeFromSelectedMeals!(widget.recipe);
+              }
+            });
+          }
+        ),
+        Expanded(
+          child: recipeButtonWidget(widget.recipe, true),
+        )
+      ]
+    );
+    }
+
+
+    
+    else {
+      // Home Recipes Button
+      return GestureDetector(
+        onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => RecipeDetailsScreen(recipe: widget.recipe),
             ),
           );
-        }
-      },
+        },
       onLongPress: () {
-        if (!widget.isMealSelection) {
-          setState(() {
-            _showDeleteOption = true;
-          });
-        }
+        setState(() {
+          _showDeleteOption = true;
+        });
       },
       child: Card(
         shape: RoundedRectangleBorder(
@@ -58,67 +92,7 @@ class _RecipeButtonState extends State<RecipeButton> {
         ),
         child: Stack(
           children: [
-            Container(
-              color: Colors.white,
-              height: 115,
-              padding:
-                  const EdgeInsets.only(bottom: 8, top: 8, left: 15, right: 15),
-              child: Row(
-                children: [
-                  Container(
-                    height: 100,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      image: widget.recipe.imagePath.isNotEmpty &&
-                              File(widget.recipe.imagePath).existsSync()
-                          ? DecorationImage(
-                              image: FileImage(File(widget.recipe.imagePath)),
-                              fit: BoxFit.cover,
-                            )
-                          : null, // No image
-                    ),
-                    child: widget.recipe.imagePath.isEmpty ||
-                            !File(widget.recipe.imagePath).existsSync()
-                        ? Center(
-                            child: Text(
-                              'No Image',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 14,
-                              ),
-                            ),
-                          )
-                        : null,
-                  ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.recipe.recipeName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          widget.recipe.recipeDescription,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Wrap(
-                          children: widget.recipe.tags
-                              .map((tag) => Chip(label: Text(tag)))
-                              .toList(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            recipeButtonWidget(widget.recipe, true),
             if (_showDeleteOption)
               Positioned(
                 top: 8,
@@ -135,28 +109,11 @@ class _RecipeButtonState extends State<RecipeButton> {
                   ),
                 ),
               ),
-            if (widget.isMealSelection)
-              Positioned(
-                bottom: 8,
-                right: 8,
-                child: Checkbox(
-                  value: mealButtonChecked,
-                  onChanged: (value) {
-                    setState(() {
-                      mealButtonChecked = value;
-                      if (value == true) {
-                        widget.addToSelectedMeals?.call(widget.recipe);
-                      } else {
-                        widget.removeFromSelectedMeals?.call(widget.recipe);
-                      }
-                    });
-                  },
-                ),
-              ),
           ],
         ),
       ),
     );
+    }
   }
 
   Future<void> _deleteRecipe() async {
@@ -172,6 +129,6 @@ class _RecipeButtonState extends State<RecipeButton> {
     );
 
     // Call the onDelete callback to refresh the list
-    widget.onDelete();
+    widget.onDelete!();
   }
 }
