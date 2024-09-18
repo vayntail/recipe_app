@@ -45,9 +45,12 @@ class _RecipesViewState extends State<RecipesView> {
           ),
         ],
       ),
-      body: const RecipesListView(
-            isMealSelection: false,
-          )
+      body: const Padding(
+        padding: EdgeInsets.only(top: 20),
+        child: RecipesListView(
+              isMealSelection: false,
+            ),
+      )
       );
   }
 }

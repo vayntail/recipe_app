@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:recipe_app/app/model/recipe.dart';
 import 'package:recipe_app/app/db/recipedb_operations.dart';
 import 'package:recipe_app/app/ui/screens/recipe_profile.dart';
-import 'package:recipe_app/app/ui/widgets/recipe_button_widget.dart';
+import 'package:recipe_app/app/ui/widgets/recipe_button/recipe_button_widget.dart';
 
 class RecipeButton extends StatefulWidget {
   final bool isMealSelection;

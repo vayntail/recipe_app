@@ -38,56 +38,66 @@ class _GroceriesViewState extends State<GroceriesView> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: appBarTitleText("Groceries")),
-        body: Column(children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              headingText("Today's List"),
+        body: Padding(
+          padding: const EdgeInsets.only(top: 20, left: 8, right: 8),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black),
+              borderRadius: BorderRadius.circular(4)
+            ),
+            padding: const EdgeInsets.only(top: 8,left: 4),
+            child: Column(children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Buttons
-                  IconButton(
-                      icon: const Icon(Icons.clear_all),
-                      tooltip: 'Clear All',
-                      onPressed: () {
-                        setState(() {
-                          _clearAllItems();
-                        });
-                      }),
-                  IconButton(
-                      icon: const Icon(Icons.add),
-                      tooltip: 'Add New',
-                      onPressed: () {
-                        setState(() {
-                          _addNewGroceryItem();
-                        });
-                      }),
+                  headingText("Today's List"),
+                  Row(
+                    children: [
+                      // Buttons
+                      IconButton(
+                          icon: const Icon(Icons.clear_all),
+                          tooltip: 'Clear All',
+                          onPressed: () {
+                            setState(() {
+                              _clearAllItems();
+                            });
+                          }),
+                      IconButton(
+                          icon: const Icon(Icons.add),
+                          tooltip: 'Add New',
+                          onPressed: () {
+                            setState(() {
+                              _addNewGroceryItem();
+                            });
+                          }),
+                    ],
+                  )
                 ],
-              )
-            ],
-          ),
-          // FUTURE BUILDER! from getGroceryList()
-          FutureBuilder(
-              future: getGroceryList(),
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                    return const Text('');
-                  default:
-                    if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      listLoaded = true;
+              ),
+              // FUTURE BUILDER! from getGroceryList()
+              FutureBuilder(
+                  future: getGroceryList(),
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return const Text('');
+                      default:
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          listLoaded = true;
+                        }
                     }
-                }
-                return listLoaded? Expanded(
-      child: ListView.builder(
-          itemCount: snapshot.data.length,
-          itemBuilder: (context, index) {
-            debugPrint(snapshot.data.toString());
-            return ListItem(groceryItem: snapshot.data[index]);
-          })): Container();
-              })
-        ]));
+                    return listLoaded? Expanded(
+                  child: ListView.builder(
+              itemCount: snapshot.data.length,
+              itemBuilder: (context, index) {
+                debugPrint(snapshot.data.toString());
+                return ListItem(groceryItem: snapshot.data[index]);
+              })): Container();
+                  })
+            ]),
+          ),
+        ));
   }
 }

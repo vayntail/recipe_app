@@ -44,7 +44,7 @@ class _MainWrapperState extends State<MainWrapper> {
       body: Padding(
         padding: const EdgeInsets.only(top: 40), // Main Container Padding
         child: [
-          RecipesView(), // Pass the notifier
+          const RecipesView(), // Pass the notifier
           const GroceriesView(),
           const CalendarView(),
           const SettingsView(),

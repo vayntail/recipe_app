@@ -53,13 +53,8 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
         IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: (){
-            // Go to main recipes_view screen. This also refreshes it
+            // Go to main recipes_view screen. This also refreshes it, and removes all navigator history to start from blank.
             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => MainWrapper()), (r) => false);
-            // Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //       builder: (context) => MainWrapper()
-            //       ));
           }), 
         title: Text(_recipe.recipeName),
         actions: [

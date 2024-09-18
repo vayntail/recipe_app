@@ -34,8 +34,6 @@ class _RecipesListViewState extends State<RecipesListView> {
   @override
   void initState() {
     super.initState();
-    
-    debugPrint("refresh screen here");
     _fetchRecipes(); // Initialize the Future
     _loadTags();
     widget.notifier
@@ -98,33 +96,31 @@ class _RecipesListViewState extends State<RecipesListView> {
     return recipesList;
   }
 
-  // Refresh the screen
-  refreshScreen() {
-    setState(() {
-      debugPrint("refreshed");
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-refreshScreen();
-
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Search bar
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextField(
             decoration: const InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: -5),
+              border: OutlineInputBorder(
+                gapPadding: 0,
+              ),
+              fillColor: Color.fromARGB(255, 218, 210, 210),
+              filled: true,
               hintText: 'Search by recipe or tag...',
-              prefixIcon: Icon(Icons.search),
+              prefixIcon: Icon(Icons.cake),
             ),
             onChanged: (query) {
               setState(() {
                 _searchQuery = query;
               });
               // Trigger a refresh of the recipe list
-              widget.notifier?.notifyListeners();
+              _onNotifierChanged();
             },
           ),
         ),
@@ -132,26 +128,30 @@ refreshScreen();
         ValueListenableBuilder<List<String>>(
           valueListenable: _tagsNotifier,
           builder: (context, tags, child) {
-            return SingleChildScrollView(
+            return 
+            
+            SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                children: tags.map((tag) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: ChoiceChip(
-                      label: Text(tag),
-                      selected: _searchQuery == tag,
-                      onSelected: (isSelected) {
-                        setState(() {
-                          _searchQuery = isSelected ? tag : '';
-                        });
-                        // Trigger a refresh of the recipe list
-                        widget.notifier?.notifyListeners();
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
+                child: Positioned(
+                  left: 0,
+                  child: Row(
+                      children: tags.map((tag) {
+                        return ChoiceChip(
+                            label: Text(tag),
+                            selected: _searchQuery == tag,
+                            onSelected: (isSelected) {
+                              setState(() {
+                                _searchQuery = isSelected ? tag : '';
+                              });
+                              // Trigger a refresh of the recipe list
+                              _onNotifierChanged();
+                            },
+                    
+                        );
+                      }).toList(),
+                  ),
+                ),
+
             );
           },
         ),
