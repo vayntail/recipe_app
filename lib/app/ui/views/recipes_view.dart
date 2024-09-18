@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:recipe_app/app/model/recipe.dart';
 import 'package:recipe_app/app/ui/components/recipes_listview.dart';
 import 'package:recipe_app/app/ui/screens/new_recipe_screen.dart';
+import 'package:recipe_app/app/ui/screens/recipe_profile.dart';
 import 'package:recipe_app/app/ui/widgets/texts_widget.dart';
 
 class RecipesView extends StatefulWidget {
-  final ValueNotifier<void> notifier;
 
-  const RecipesView({super.key, required this.notifier});
+  const RecipesView({super.key});
 
   @override
   State<RecipesView> createState() => _RecipesViewState();
 }
 
 class _RecipesViewState extends State<RecipesView> {
+
+  // Go to recipe details screen
+  openRecipeDetailsScreen(Recipe recipe) {
+    Navigator.push(context,
+    MaterialPageRoute(builder: (context) => RecipeDetailsScreen(recipe: recipe)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,9 +35,8 @@ class _RecipesViewState extends State<RecipesView> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => NewRecipeScreen(
-                    onRecipeSaved: () {
-                      // Notify listeners when a new recipe is saved
-                      widget.notifier.notifyListeners();
+                    onRecipeSaved: (Recipe recipe) {
+                      openRecipeDetailsScreen(recipe);
                     },
                   ),
                 ),
@@ -38,15 +45,9 @@ class _RecipesViewState extends State<RecipesView> {
           ),
         ],
       ),
-      body: ValueListenableBuilder<void>(
-        valueListenable: widget.notifier,
-        builder: (context, _, __) {
-          return RecipesListView(
+      body: const RecipesListView(
             isMealSelection: false,
-            notifier: widget.notifier,
-          );
-        },
-      ),
-    );
+          )
+      );
   }
 }

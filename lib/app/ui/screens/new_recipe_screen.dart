@@ -3,8 +3,10 @@ import 'package:recipe_app/app/db/recipedb_operations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+import 'package:recipe_app/app/model/recipe.dart';
+
 class NewRecipeScreen extends StatefulWidget {
-  final VoidCallback onRecipeSaved;
+  final Function onRecipeSaved;
   final int? recipeId; // Optional parameter to handle recipe updates
 
   const NewRecipeScreen({
@@ -89,6 +91,7 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
   }
 
   Future<void> _saveRecipe() async {
+    int id;
     if (_formKey.currentState?.validate() ?? false) {
       try {
         final uniqueTags =
@@ -107,6 +110,7 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
             uniqueTags,
             _ingredientControllers.map((e) => e.text).toList(),
           );
+          id=widget.recipeId as int;
         } else {
           // Insert new recipe
           final int recipeId = await _recipeOperations.insertRecipe(
@@ -134,14 +138,32 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
             print('Adding tag: $tag');
             await _recipeOperations.addTagToRecipeIfNotExists(recipeId, tag);
           }
+          id = recipeId;
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Recipe Saved Successfully')),
         );
+
+        // Make a new Recipe object and pass it into different pages.
+        Recipe recipe = Recipe(
+          recipeId: id,
+          imagePath: _imagePath ?? '',
+          recipeName: _recipeNameController.text,
+          recipeDescription:_descriptionController.text,
+          hours: _selectedHour,
+          minutes: _selectedMinute,
+          ingredients: _ingredientControllers.map((e) => e.text).toList(),
+          directions: _directionsController.text,
+          link: _linkController.text,
+          tags: uniqueTags,
+        );
+
         Navigator.pop(context); // Navigate back after saving
+        widget.onRecipeSaved(recipe); // pass recipe object
         _resetIngredients();
-        widget.onRecipeSaved();
+        
+        
       } catch (e) {
         print('Error saving recipe: $e');
       }

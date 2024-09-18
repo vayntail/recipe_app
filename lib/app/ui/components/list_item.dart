@@ -5,9 +5,8 @@ import 'package:recipe_app/app/model/grocery_item.dart';
 /// Grocery List Item
 class ListItem extends StatefulWidget {
   const ListItem(
-      {super.key, required this.groceryItem, required this.refreshScreen});
+      {super.key, required this.groceryItem});
   final GroceryItem groceryItem;
-  final Function refreshScreen;
 
   @override
   State<ListItem> createState() => _ListItemState();

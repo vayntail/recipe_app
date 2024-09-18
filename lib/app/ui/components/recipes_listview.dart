@@ -9,6 +9,7 @@ class RecipesListView extends StatefulWidget {
   final Function? addToSelectedMeals;
   final Function? removeFromSelectedMeals;
   final Function? checkIfInSelectedMeals;
+  final Function? refreshScreen;
 
   const RecipesListView({
     super.key,
@@ -17,6 +18,7 @@ class RecipesListView extends StatefulWidget {
     this.removeFromSelectedMeals,
     this.notifier, 
     this.checkIfInSelectedMeals,
+    this.refreshScreen,
   });
 
   @override
@@ -32,6 +34,8 @@ class _RecipesListViewState extends State<RecipesListView> {
   @override
   void initState() {
     super.initState();
+    
+    debugPrint("refresh screen here");
     _fetchRecipes(); // Initialize the Future
     _loadTags();
     widget.notifier
@@ -94,8 +98,17 @@ class _RecipesListViewState extends State<RecipesListView> {
     return recipesList;
   }
 
+  // Refresh the screen
+  refreshScreen() {
+    setState(() {
+      debugPrint("refreshed");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+refreshScreen();
+
     return Column(
       children: [
         // Search bar

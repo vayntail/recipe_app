@@ -33,19 +33,9 @@ class _GroceriesViewState extends State<GroceriesView> {
     await _groceryOperations.clearGroceryList();
   }
 
-        // Refresh the screen
-  refreshScreen() {
-    setState(() {
-      debugPrint("refreshed");
-    });
-  }
-
-
   bool listLoaded = false;
   @override
   Widget build(BuildContext context) {
-
-    
     return Scaffold(
         appBar: AppBar(title: appBarTitleText("Groceries")),
         body: Column(children: [
@@ -95,7 +85,7 @@ class _GroceriesViewState extends State<GroceriesView> {
           itemCount: snapshot.data.length,
           itemBuilder: (context, index) {
             debugPrint(snapshot.data.toString());
-            return ListItem(groceryItem: snapshot.data[index], refreshScreen: refreshScreen,);
+            return ListItem(groceryItem: snapshot.data[index]);
           })): Container();
               })
         ]));

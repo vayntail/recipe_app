@@ -36,8 +36,6 @@ class MainWrapper extends StatefulWidget {
 
 class _MainWrapperState extends State<MainWrapper> {
   int selectedIndex = 0;
-  final ValueNotifier<void> _recipesNotifier =
-      ValueNotifier<void>(null); // ValueNotifier for recipes
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +44,7 @@ class _MainWrapperState extends State<MainWrapper> {
       body: Padding(
         padding: const EdgeInsets.only(top: 40), // Main Container Padding
         child: [
-          RecipesView(notifier: _recipesNotifier), // Pass the notifier
+          RecipesView(), // Pass the notifier
           const GroceriesView(),
           const CalendarView(),
           const SettingsView(),

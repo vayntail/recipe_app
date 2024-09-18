@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:recipe_app/app/main.dart';
 import 'package:recipe_app/app/model/recipe.dart';
 import 'package:recipe_app/app/ui/screens/new_recipe_screen.dart';
 import 'dart:io';
@@ -38,10 +39,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RecipesView(
-          notifier: widget.notifier ??
-              ValueNotifier<void>(null), // Pass null instead of void()
-        ),
+        builder: (context) => RecipesView(),
       ),
     );
     await _getRecipeFromDatabase();
@@ -51,6 +49,18 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: 
+        IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: (){
+            // Go to main recipes_view screen. This also refreshes it
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => MainWrapper()), (r) => false);
+            // Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => MainWrapper()
+            //       ));
+          }), 
         title: Text(_recipe.recipeName),
         actions: [
           IconButton(
@@ -60,9 +70,9 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => NewRecipeScreen(
-                    onRecipeSaved: () {
+                    onRecipeSaved: (Recipe recipe) {
                       setState(() {
-                        _navigateAndUpdateRecipe();
+                        _recipe = recipe;
                       });
                     },
                     recipeId: _recipe.recipeId,
