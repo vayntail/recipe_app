@@ -17,9 +17,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    // Set theme
-  ThemeController().themeOne();
-
     return MaterialApp(
       title: 'Recipe App',
       theme: ThemeController().themeData,
@@ -60,7 +57,7 @@ class _MainWrapperState extends State<MainWrapper> {
       bottomNavigationBar: NavigationBar(
         indicatorColor: const Color.fromARGB(0, 255, 255, 255),
         height: 110,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+        
         selectedIndex: selectedIndex,
         onDestinationSelected: (int index) {
           setState(() {

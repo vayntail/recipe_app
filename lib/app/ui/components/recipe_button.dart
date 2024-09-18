@@ -73,40 +73,30 @@ class _RecipeButtonState extends State<RecipeButton> {
             ),
           );
         },
-        onLongPress: () {
-          setState(() {
-            _showDeleteOption = true;
-          });
-        },
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-            side: const BorderSide(
-              color: Colors.black,
-              width: 1,
-            ),
-          ),
-          child: Stack(
-            children: [
-              recipeButtonWidget(widget.recipe, true),
-              if (_showDeleteOption)
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: _deleteRecipe,
-                    child: Container(
-                      color: Colors.red,
-                      padding: const EdgeInsets.all(8.0),
-                      child: const Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
+      onLongPress: () {
+        setState(() {
+          _showDeleteOption = true;
+        });
+      },
+      child: Stack(
+          children: [
+            recipeButtonWidget(widget.recipe, true),
+            if (_showDeleteOption)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: _deleteRecipe,
+                  child: Container(
+                    color: Colors.red,
+                    padding: const EdgeInsets.all(8.0),
+                    child: const Icon(
+                      Icons.delete,
+                      color: Colors.white,
                     ),
                   ),
                 ),
-            ],
-          ),
+               )         ],
         ),
       );
     }

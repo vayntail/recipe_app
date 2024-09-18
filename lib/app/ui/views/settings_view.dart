@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:recipe_app/app/ui/widgets/texts_widget.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -6,12 +7,9 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    void temp () {
-
-    }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: appBarTitleText("Settings")),
       body: const Column(
         children: [
           Text("Themes"),

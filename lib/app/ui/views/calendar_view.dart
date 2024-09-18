@@ -5,6 +5,7 @@ import 'package:recipe_app/app/model/recipe.dart';
 import 'package:recipe_app/app/ui/components/calendar.dart';
 import 'package:recipe_app/app/ui/components/recipe_button.dart';
 import 'package:recipe_app/app/ui/screens/meal_selection_screen.dart';
+import 'package:recipe_app/app/ui/widgets/texts_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarView extends StatefulWidget {
@@ -64,7 +65,7 @@ class _CalendarViewState extends State<CalendarView> {
     
 
     return Scaffold(
-        appBar: AppBar(title: const Text('Calendar'), actions: <Widget>[
+        appBar: AppBar(title: appBarTitleText("Calendar"), actions: <Widget>[
           IconButton(
             onPressed: () {
               setState(() {
@@ -85,11 +86,8 @@ class _CalendarViewState extends State<CalendarView> {
             Calendar(format: format, setSelectedDay: setSelectedDay,),
             Expanded(
               child: ListView(children: [
-                Text(
-                  // Display currently selected date to screen
-                  "${getDayOfWeek(_selectedDay.weekday)}, ${_selectedDay.month}-${_selectedDay.day}",
-                  style: const TextStyle(fontSize: 23)
-                  ),
+                // Display currently selected date to screen
+                headingText("${getDayOfWeek(_selectedDay.weekday)}, ${_selectedDay.month}-${_selectedDay.day}"),
                 const Text("Breakfast"),
                 MealTypeColumn(selectedMeals:_calendarDay.breakfast, calendarDay: _calendarDay, mealType: 1,),
                 const Text("Lunch"),

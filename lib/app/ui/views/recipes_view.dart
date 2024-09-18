@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_app/app/ui/components/recipes_listview.dart';
 import 'package:recipe_app/app/ui/screens/new_recipe_screen.dart';
+import 'package:recipe_app/app/ui/widgets/texts_widget.dart';
 
 class RecipesView extends StatefulWidget {
   final ValueNotifier<void> notifier;
@@ -16,7 +17,7 @@ class _RecipesViewState extends State<RecipesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recipes'),
+        title: appBarTitleText('Recipes'),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.add),

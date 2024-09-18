@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
 
 class ThemeController {
-  ThemeData themeData = ThemeData();
-  BoxDecoration recipeButtonBoxDecoration = const BoxDecoration();
-
-  void themeOne() {
-    themeData = ThemeData(
-        appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent),
+  ThemeData themeData = ThemeData(
+    fontFamily: 'NanumPenScript',
+    
+        navigationBarTheme: NavigationBarThemeData(
+          backgroundColor: Color.fromARGB(255, 255, 202, 202),
+          labelTextStyle: MaterialStateProperty.resolveWith((states){
+            if (states.contains(MaterialState.selected)) {
+              return const TextStyle(
+                fontFamily: "Mansalva",
+                color: Color.fromARGB(255, 59, 58, 55),
+              );
+            }
+            else {
+              return const TextStyle(
+                fontFamily: "Mansalva",
+                color: Color.fromARGB(125, 59, 58, 55),
+              );
+            }
+          })
+          ),
+        appBarTheme: const AppBarTheme(backgroundColor: Color.fromARGB(0, 255, 255, 255)),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
-        scaffoldBackgroundColor: const Color.fromARGB(255, 255, 239, 239));
-    recipeButtonBoxDecoration =
-        BoxDecoration(border: Border.all(color: Colors.black, width: 1));
-  }
+        scaffoldBackgroundColor: const Color.fromARGB(255, 247, 234, 228),
+        );    
 }

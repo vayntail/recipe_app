@@ -40,7 +40,18 @@ flutter:
     - assets/imgs/kimbap-img.jpg
     - assets/imgs/sandwich-img.jpg
     - assets/imgs/default_image.png
+    - assets/Layer1.png
 
+  fonts:
+      - family: Mansalva
+        fonts:
+          - asset: fonts/Mansalva/Mansalva-Regular.ttf
+      - family: LovedbytheKing
+        fonts:
+          - asset: fonts/Loved_by_the_King/LovedbytheKing-Regular.ttf
+      - family: NanumPenScript
+        fonts:
+          - asset: fonts/Nanum_Pen_Script/NanumPenScript-Regular.ttf
     
 
   # An image asset can refer to one or more resolution-specific "variants", see

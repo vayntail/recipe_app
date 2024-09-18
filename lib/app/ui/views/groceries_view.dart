@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:recipe_app/app/db/grocerydb_operations.dart';
 import 'package:recipe_app/app/model/grocery_item.dart';
 import 'package:recipe_app/app/ui/components/list_item.dart';
+import 'package:recipe_app/app/ui/widgets/texts_widget.dart';
 
 class GroceriesView extends StatefulWidget {
   const GroceriesView({super.key});
@@ -46,12 +47,12 @@ class _GroceriesViewState extends State<GroceriesView> {
 
     
     return Scaffold(
-        appBar: AppBar(title: const Text('Groceries')),
+        appBar: AppBar(title: appBarTitleText("Groceries")),
         body: Column(children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Today's List"),
+              headingText("Today's List"),
               Row(
                 children: [
                   // Buttons
