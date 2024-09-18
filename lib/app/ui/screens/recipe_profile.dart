@@ -2,17 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:recipe_app/app/model/recipe.dart';
 import 'package:recipe_app/app/ui/screens/new_recipe_screen.dart';
 import 'dart:io';
+import 'package:recipe_app/app/db/recipedb_operations.dart';
 
-class RecipeDetailsScreen extends StatelessWidget {
+class RecipeDetailsScreen extends StatefulWidget {
   final Recipe recipe;
 
   const RecipeDetailsScreen({super.key, required this.recipe});
 
   @override
+  State<RecipeDetailsScreen> createState() => _RecipeDetailsScreenState();
+}
+
+class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
+  late Recipe _recipe = widget.recipe;
+  final RecipeOperations _recipeOperations = RecipeOperations();
+
+  
+  // Update recipe by the recipeId
+  _getRecipeFromDatabase() async {
+    _recipe = await _recipeOperations.getRecipeFromId(widget.recipe.recipeId);
+    debugPrint(_recipe.toString());
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    
     return Scaffold(
       appBar: AppBar(
-        title: Text(recipe.recipeName),
+        title: Text(_recipe.recipeName),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -22,10 +40,11 @@ class RecipeDetailsScreen extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => NewRecipeScreen(
                     onRecipeSaved: () {
-                      // Optionally, you can use this callback to refresh data
-                      Navigator.pop(context); // Go back to the details screen
+                      setState(() {
+                        _getRecipeFromDatabase();
+                      });
                     },
-                    recipeId: recipe.recipeId, // Pass the recipe ID for editing
+                    recipeId: _recipe.recipeId, // Pass the recipe ID for editing
                   ),
                 ),
               );
@@ -41,10 +60,10 @@ class RecipeDetailsScreen extends StatelessWidget {
             Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: recipe.imagePath.isNotEmpty &&
-                        File(recipe.imagePath).existsSync()
+                child: _recipe.imagePath.isNotEmpty &&
+                        File(_recipe.imagePath).existsSync()
                     ? Image.file(
-                        File(recipe.imagePath),
+                        File(_recipe.imagePath),
                         width: 200,
                         height: 200,
                         fit: BoxFit.cover,
@@ -68,7 +87,7 @@ class RecipeDetailsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              recipe.recipeName,
+              _recipe.recipeName,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 26,
@@ -78,7 +97,7 @@ class RecipeDetailsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              recipe.recipeDescription,
+              _recipe.recipeDescription,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 16,
@@ -90,7 +109,7 @@ class RecipeDetailsScreen extends StatelessWidget {
             Wrap(
               spacing: 8.0,
               runSpacing: 4.0,
-              children: (recipe.tags ?? [])
+              children: (_recipe.tags ?? [])
                   .map((tag) => Chip(
                         label: Text(tag),
                         backgroundColor: Colors.blue[100],
@@ -105,13 +124,13 @@ class RecipeDetailsScreen extends StatelessWidget {
                 Icon(Icons.access_time, color: Colors.grey[600]),
                 const SizedBox(width: 8),
                 Text(
-                  '${recipe.hours}h ${recipe.minutes}m',
+                  '${_recipe.hours}h ${_recipe.minutes}m',
                   style: const TextStyle(fontSize: 16, color: Colors.black87),
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            if (recipe.link.isNotEmpty)
+            if (_recipe.link.isNotEmpty)
               TextButton.icon(
                 onPressed: () {
                   // Implement URL launching here
@@ -125,13 +144,13 @@ class RecipeDetailsScreen extends StatelessWidget {
             const SizedBox(height: 24),
             _buildSectionTitle('Directions'),
             Text(
-              recipe.directions,
+              _recipe.directions,
               style: const TextStyle(fontSize: 16, color: Colors.black87),
               textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 24),
             _buildSectionTitle('Ingredients'),
-            ...(recipe.ingredients ?? []).map((ingredient) => Padding(
+            ...(_recipe.ingredients ?? []).map((ingredient) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: Text(
                     '• $ingredient',

@@ -341,4 +341,30 @@ class RecipeOperations {
       }
     }
   }
+
+// Get recipe object by recipe Id
+  Future<Recipe> getRecipeFromId(int recipeId) async {
+    final db = await _dbHelper.database;
+
+    // Query recipe 
+    final List<Map<String, dynamic>> dbRecipes = await db.query(
+      'recipes',
+      where: 'recipe_id = ?',
+      whereArgs: [recipeId]
+    );
+    final Map<String, dynamic> dbRecipe = dbRecipes.first;
+
+    // Convert into Recipe object
+    Recipe recipe = Recipe(
+      recipeId: dbRecipe['recipe_id'], 
+      imagePath: dbRecipe['image_path'], 
+      recipeName: dbRecipe['recipe_name'], 
+      recipeDescription: dbRecipe['recipe_description'], 
+      hours: dbRecipe['hours'], 
+      minutes: dbRecipe['minutes'],
+      directions: dbRecipe['directions'], 
+      link: dbRecipe['link']
+      );
+    return recipe;
+  }
 }
