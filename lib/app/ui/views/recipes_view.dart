@@ -27,6 +27,7 @@ class _RecipesViewState extends State<RecipesView> {
                 MaterialPageRoute(
                   builder: (context) => NewRecipeScreen(
                     onRecipeSaved: () {
+                      // Notify listeners when a new recipe is saved
                       widget.notifier.notifyListeners();
                     },
                   ),
@@ -36,9 +37,14 @@ class _RecipesViewState extends State<RecipesView> {
           ),
         ],
       ),
-      body: RecipesListView(
-        isMealSelection: false,
-        notifier: widget.notifier,
+      body: ValueListenableBuilder<void>(
+        valueListenable: widget.notifier,
+        builder: (context, _, __) {
+          return RecipesListView(
+            isMealSelection: false,
+            notifier: widget.notifier,
+          );
+        },
       ),
     );
   }

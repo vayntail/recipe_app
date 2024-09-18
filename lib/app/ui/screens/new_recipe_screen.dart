@@ -7,8 +7,11 @@ class NewRecipeScreen extends StatefulWidget {
   final VoidCallback onRecipeSaved;
   final int? recipeId; // Optional parameter to handle recipe updates
 
-  const NewRecipeScreen(
-      {super.key, required this.onRecipeSaved, this.recipeId});
+  const NewRecipeScreen({
+    super.key,
+    required this.onRecipeSaved,
+    this.recipeId,
+  });
 
   @override
   _NewRecipeScreenState createState() => _NewRecipeScreenState();

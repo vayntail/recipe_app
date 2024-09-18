@@ -11,7 +11,9 @@ class RecipeButton extends StatefulWidget {
   final VoidCallback? onDelete; // Callback for deletion
   final Function? addToSelectedMeals;
   final Function? removeFromSelectedMeals;
-  final Function? checkIfInSelectedMeals; // Used to check if a recipe is already selected or not, for displaying checkmark
+  final Function?
+      checkIfInSelectedMeals; // Used to check if a recipe is already selected or not, for displaying checkmark
+  final ValueNotifier<void>? notifier; // Add notifier if used
 
   const RecipeButton({
     super.key,
@@ -20,7 +22,8 @@ class RecipeButton extends StatefulWidget {
     this.onDelete,
     this.addToSelectedMeals,
     this.removeFromSelectedMeals,
-    this.checkIfInSelectedMeals
+    this.checkIfInSelectedMeals,
+    this.notifier, // Add notifier
   });
 
   @override
@@ -31,88 +34,81 @@ class _RecipeButtonState extends State<RecipeButton> {
   bool _showDeleteOption = false;
   bool? mealButtonChecked = false;
 
-
   @override
   Widget build(BuildContext context) {
-
-    
-    // MealButton
-    if (widget.isMealSelection){
-      mealButtonChecked = widget.checkIfInSelectedMeals!(widget.recipe);
+    if (widget.isMealSelection) {
+      mealButtonChecked = widget.checkIfInSelectedMeals?.call(widget.recipe);
 
       return Row(
-      children: [
-        Checkbox(
-          value: mealButtonChecked, 
-          onChanged: (bool? value){
-            setState(() {
-              mealButtonChecked = value!;
-              // Add or Remove to selected meals list
-              if (mealButtonChecked==true){
-                widget.addToSelectedMeals!(widget.recipe);
-              }
-              else {
-                widget.removeFromSelectedMeals!(widget.recipe);
-              }
-            });
-          }
-        ),
-        Expanded(
-          child: recipeButtonWidget(widget.recipe, true),
-        )
-      ]
-    );
-    }
-
-
-    
-    else {
-      // Home Recipes Button
+        children: [
+          Checkbox(
+            value: mealButtonChecked,
+            onChanged: (bool? value) {
+              setState(() {
+                mealButtonChecked = value!;
+                // Add or Remove to selected meals list
+                if (mealButtonChecked == true) {
+                  widget.addToSelectedMeals?.call(widget.recipe);
+                } else {
+                  widget.removeFromSelectedMeals?.call(widget.recipe);
+                }
+              });
+            },
+          ),
+          Expanded(
+            child: recipeButtonWidget(widget.recipe, true),
+          ),
+        ],
+      );
+    } else {
       return GestureDetector(
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => RecipeDetailsScreen(recipe: widget.recipe),
+              builder: (context) => RecipeDetailsScreen(
+                recipe: widget.recipe,
+                notifier: widget.notifier, // Pass notifier if used
+              ),
             ),
           );
         },
-      onLongPress: () {
-        setState(() {
-          _showDeleteOption = true;
-        });
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(
-            color: Colors.black,
-            width: 1,
+        onLongPress: () {
+          setState(() {
+            _showDeleteOption = true;
+          });
+        },
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: const BorderSide(
+              color: Colors.black,
+              width: 1,
+            ),
           ),
-        ),
-        child: Stack(
-          children: [
-            recipeButtonWidget(widget.recipe, true),
-            if (_showDeleteOption)
-              Positioned(
-                top: 8,
-                right: 8,
-                child: GestureDetector(
-                  onTap: _deleteRecipe,
-                  child: Container(
-                    color: Colors.red,
-                    padding: const EdgeInsets.all(8.0),
-                    child: const Icon(
-                      Icons.delete,
-                      color: Colors.white,
+          child: Stack(
+            children: [
+              recipeButtonWidget(widget.recipe, true),
+              if (_showDeleteOption)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: _deleteRecipe,
+                    child: Container(
+                      color: Colors.red,
+                      padding: const EdgeInsets.all(8.0),
+                      child: const Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
     }
   }
 
@@ -128,7 +124,6 @@ class _RecipeButtonState extends State<RecipeButton> {
       const SnackBar(content: Text('Recipe deleted')),
     );
 
-    // Call the onDelete callback to refresh the list
-    widget.onDelete!();
+    widget.onDelete?.call(); // Ensure onDelete is not null
   }
 }

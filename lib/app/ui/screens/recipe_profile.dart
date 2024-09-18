@@ -3,11 +3,13 @@ import 'package:recipe_app/app/model/recipe.dart';
 import 'package:recipe_app/app/ui/screens/new_recipe_screen.dart';
 import 'dart:io';
 import 'package:recipe_app/app/db/recipedb_operations.dart';
+import 'package:recipe_app/app/ui/views/recipes_view.dart';
 
 class RecipeDetailsScreen extends StatefulWidget {
   final Recipe recipe;
+  final ValueNotifier<void>? notifier; // Add notifier if used
 
-  const RecipeDetailsScreen({super.key, required this.recipe});
+  const RecipeDetailsScreen({super.key, required this.recipe, this.notifier});
 
   @override
   State<RecipeDetailsScreen> createState() => _RecipeDetailsScreenState();
@@ -17,17 +19,36 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
   late Recipe _recipe = widget.recipe;
   final RecipeOperations _recipeOperations = RecipeOperations();
 
-  
-  // Update recipe by the recipeId
-  _getRecipeFromDatabase() async {
-    _recipe = await _recipeOperations.getRecipeFromId(widget.recipe.recipeId);
+  @override
+  void initState() {
+    super.initState();
+    _recipe = widget.recipe;
+  }
+
+  Future<void> _getRecipeFromDatabase() async {
+    final updatedRecipe =
+        await _recipeOperations.getRecipeFromId(widget.recipe.recipeId);
+    setState(() {
+      _recipe = updatedRecipe;
+    });
     debugPrint(_recipe.toString());
+  }
+
+  Future<void> _navigateAndUpdateRecipe() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecipesView(
+          notifier: widget.notifier ??
+              ValueNotifier<void>(null), // Pass null instead of void()
+        ),
+      ),
+    );
+    await _getRecipeFromDatabase();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    
     return Scaffold(
       appBar: AppBar(
         title: Text(_recipe.recipeName),
@@ -41,10 +62,10 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                   builder: (context) => NewRecipeScreen(
                     onRecipeSaved: () {
                       setState(() {
-                        _getRecipeFromDatabase();
+                        _navigateAndUpdateRecipe();
                       });
                     },
-                    recipeId: _recipe.recipeId, // Pass the recipe ID for editing
+                    recipeId: _recipe.recipeId,
                   ),
                 ),
               );
