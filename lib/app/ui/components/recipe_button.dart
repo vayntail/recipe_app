@@ -43,10 +43,10 @@ class _RecipeButtonState extends State<RecipeButton> {
         children: [
           Checkbox(
             value: mealButtonChecked,
+            tristate: true, // Allow the checkbox to have a null value.
             onChanged: (bool? value) {
               setState(() {
                 mealButtonChecked = value!;
-                // Add or Remove to selected meals list
                 if (mealButtonChecked == true) {
                   widget.addToSelectedMeals?.call(widget.recipe);
                 } else {
@@ -73,12 +73,12 @@ class _RecipeButtonState extends State<RecipeButton> {
             ),
           );
         },
-      onLongPress: () {
-        setState(() {
-          _showDeleteOption = true;
-        });
-      },
-      child: Stack(
+        onLongPress: () {
+          setState(() {
+            _showDeleteOption = true;
+          });
+        },
+        child: Stack(
           children: [
             recipeButtonWidget(widget.recipe, true),
             if (_showDeleteOption)
@@ -96,7 +96,8 @@ class _RecipeButtonState extends State<RecipeButton> {
                     ),
                   ),
                 ),
-               )         ],
+              )
+          ],
         ),
       );
     }
