@@ -38,7 +38,7 @@ class _GroceriesViewState extends State<GroceriesView> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          centerTitle: false,title: appBarTitleText("Groceries")),
+          centerTitle: true,title: appBarTitleText("Groceries")),
         body: Padding(
           padding: const EdgeInsets.only(top: 37, left: 8, right: 8,),
           child: Container(
@@ -72,7 +72,7 @@ class _GroceriesViewState extends State<GroceriesView> {
                     topLeft: Radius.circular(7),
                     topRight: Radius.circular(7)
                   ),
-                  color: Color.fromARGB(255, 250, 225, 219),
+                  color: Color.fromARGB(255, 255, 243, 240),
                   border: Border(bottom: BorderSide(
                     color: Colors.black,
                     width: 1.5,

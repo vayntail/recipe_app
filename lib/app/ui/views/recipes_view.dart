@@ -26,7 +26,7 @@ class _RecipesViewState extends State<RecipesView> {
     return Scaffold(
       
       appBar: AppBar(
-        centerTitle: false,
+        centerTitle: true,
         title: appBarTitleText('Recipes'),
         actions: <Widget>[
           IconButton(
@@ -48,7 +48,7 @@ class _RecipesViewState extends State<RecipesView> {
         ],
       ),
       body: const Padding(
-        padding: EdgeInsets.only(top: 20),
+        padding: EdgeInsets.only(top: 25),
         child: RecipesListView(
               isMealSelection: false,
             ),

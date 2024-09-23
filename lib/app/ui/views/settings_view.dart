@@ -25,19 +25,24 @@ class SettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: false,title: appBarTitleText("Settings")),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed:(){_showDeleteConfirmationDialog(context);},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Delete Database'),
+        centerTitle: true,title: appBarTitleText("Settings")),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 80),
+        child: Center(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed:(){_showDeleteConfirmationDialog(context);},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Delete Database'),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

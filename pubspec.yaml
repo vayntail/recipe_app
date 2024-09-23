@@ -45,6 +45,7 @@ flutter:
     - assets/cats/setting_cat.png
     - assets/icons/add2.png
     - assets/icons/clear.png
+    - assets/icons/calendar.png
 
   fonts:
       - family: Mansalva

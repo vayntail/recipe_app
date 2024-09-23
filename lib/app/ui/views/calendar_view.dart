@@ -58,80 +58,97 @@ class _CalendarViewState extends State<CalendarView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: false,
-          title: appBarTitleText("Calendar"), actions: <Widget>[
+      appBar: AppBar(
+        centerTitle: true,
+        title: appBarTitleText("Calendar"),
+        actions: <Widget>[
           IconButton(
-            onPressed: () {
-              setState(() {
-                format = format == CalendarFormat.week
-                    ? CalendarFormat.month
-                    : CalendarFormat.week;
-              });
-            },
-            icon: const Icon(Icons.calendar_month),
+              icon: Image.asset('assets/icons/calendar.png'),
+              tooltip: 'Clear All',
+              onPressed: () {
+                setState(() {
+                  format = format == CalendarFormat.week
+                      ? CalendarFormat.month
+                      : CalendarFormat.week;
+                });
+              },
             selectedIcon: const Icon(Icons.calendar_view_week),
+
+            
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Calendar(format: format, setSelectedDay: setSelectedDay),
-          Expanded(
-            child: FutureBuilder<CalendarDay>(
-              future: _loadCalendarDay(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData) {
-                  return const Center(child: Text('No data available'));
-                } else {
-                  final calendarDay = snapshot.data!;
-                  return ListView(
-                    children: [
-                      headingText(
-                          "${getDayOfWeek(_selectedDay.weekday)}, ${_selectedDay.month}-${_selectedDay.day}"),
-                      const Text("Breakfast"),
-                      MealTypeColumn(
-                        selectedMeals: calendarDay.breakfast,
-                        calendarDay: calendarDay,
-                        mealType: 1,
-                        date: _selectedDay,
-                        onMealsUpdated: () => setState(() {}),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 30),
+        child: Column(
+          children: [
+            Calendar(format: format, setSelectedDay: setSelectedDay),
+            Expanded(
+              child: FutureBuilder<CalendarDay>(
+                future: _loadCalendarDay(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData) {
+                    return const Center(child: Text('No data available'));
+                  } else {
+                    final calendarDay = snapshot.data!;
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 255, 243, 240),
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      const Text("Lunch"),
-                      MealTypeColumn(
-                        selectedMeals: calendarDay.lunch,
-                        calendarDay: calendarDay,
-                        mealType: 2,
-                        date: _selectedDay,
-                        onMealsUpdated: () => setState(() {}),
+                      padding:
+                          const EdgeInsets.only(left: 10, right: 10, top: 20),
+                      margin: const EdgeInsets.only(left: 3, right: 3, top: 8),
+                      child: ListView(
+                        children: [
+                          headingText(
+                              "${getDayOfWeek(_selectedDay.weekday)}, ${_selectedDay.month}-${_selectedDay.day}"),
+                          const Text("Breakfast"),
+                          MealTypeColumn(
+                            selectedMeals: calendarDay.breakfast,
+                            calendarDay: calendarDay,
+                            mealType: 1,
+                            date: _selectedDay,
+                            onMealsUpdated: () => setState(() {}),
+                          ),
+                          const Text("Lunch"),
+                          MealTypeColumn(
+                            selectedMeals: calendarDay.lunch,
+                            calendarDay: calendarDay,
+                            mealType: 2,
+                            date: _selectedDay,
+                            onMealsUpdated: () => setState(() {}),
+                          ),
+                          const Text("Dinner"),
+                          MealTypeColumn(
+                            selectedMeals: calendarDay.dinner,
+                            calendarDay: calendarDay,
+                            mealType: 3,
+                            date: _selectedDay,
+                            onMealsUpdated: () => setState(() {}),
+                          ),
+                          const Text("Snacks"),
+                          MealTypeColumn(
+                            selectedMeals: calendarDay.snacks,
+                            calendarDay: calendarDay,
+                            mealType: 4,
+                            date: _selectedDay,
+                            onMealsUpdated: () => setState(() {}),
+                          ),
+                        ],
                       ),
-                      const Text("Dinner"),
-                      MealTypeColumn(
-                        selectedMeals: calendarDay.dinner,
-                        calendarDay: calendarDay,
-                        mealType: 3,
-                        date: _selectedDay,
-                        onMealsUpdated: () => setState(() {}),
-                      ),
-                      const Text("Snacks"),
-                      MealTypeColumn(
-                        selectedMeals: calendarDay.snacks,
-                        calendarDay: calendarDay,
-                        mealType: 4,
-                        date: _selectedDay,
-                        onMealsUpdated: () => setState(() {}),
-                      ),
-                    ],
-                  );
-                }
-              },
+                    );
+                  }
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

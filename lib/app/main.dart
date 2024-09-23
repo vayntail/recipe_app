@@ -49,10 +49,10 @@ class _MainWrapperState extends State<MainWrapper> {
               const RecipesView(),
               // Cute cat picture
               Positioned(
-                top: 20,
-                left: 120,
+                top: 10,
+                left: 5,
                 child: SizedBox(
-                  width: 100,
+                  width: 160,
                   height: 100,
                   child: Image.asset("assets/cats/recipe_cat.png"),)
               ),
@@ -63,8 +63,8 @@ class _MainWrapperState extends State<MainWrapper> {
               const GroceriesView(),
               // Cute cat picture
               Positioned(
-                top: 20,
-                left: 120,
+                top: 15,
+                left: 5,
                 child: SizedBox(
                   width: 100,
                   height: 100,
@@ -77,8 +77,8 @@ class _MainWrapperState extends State<MainWrapper> {
               const CalendarView(),
               // Cute cat picture
               Positioned(
-                top: 20,
-                left: 120,
+                top: 10,
+                left: 5,
                 child: SizedBox(
                   width: 100,
                   height: 100,
@@ -91,10 +91,10 @@ class _MainWrapperState extends State<MainWrapper> {
               const SettingsView(),
               // Cute cat picture
               Positioned(
-                top: 20,
-                left: 120,
+                top: 14,
+                left: 5,
                 child: SizedBox(
-                  width: 100,
+                  width: 160,
                   height: 100,
                   child: Image.asset("assets/cats/setting_cat.png"),)
               ),

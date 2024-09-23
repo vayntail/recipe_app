@@ -13,14 +13,14 @@ Widget searchBar(Function onChanged){
             padding: const EdgeInsets.only(right: 70),
             child: TextField(
               decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(vertical: -5),
+                contentPadding: const EdgeInsets.symmetric(vertical: -10),
                 enabledBorder: searchBarBorder(),
                 border: searchBarBorder(),
                 focusedBorder: searchBarBorder(),
                 fillColor: Colors.transparent,
                 filled: true,
                 hintText: 'Search by recipe or tag...',
-                prefixIcon: SizedBox(width: 20, height: 20, child: Image.asset("assets/icons/search.png")),
+                prefixIcon: SizedBox(width: 10, height: 10, child: Image.asset("assets/icons/search.png")),
               ),
               onChanged: (query) {
                 onChanged(query);
