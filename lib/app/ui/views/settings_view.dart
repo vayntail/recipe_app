@@ -26,11 +26,11 @@ class SettingsView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,title: appBarTitleText("Settings")),
-      body: const Column(
+      body: Column(
         children: [
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () => _showDeleteConfirmationDialog(context),
+            onPressed:(){_showDeleteConfirmationDialog(context);},
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
