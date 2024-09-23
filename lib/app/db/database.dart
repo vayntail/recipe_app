@@ -20,6 +20,14 @@ class DatabaseHelper {
     return _database!;
   }
 
+  // Method to delete the database and reset the instance
+  Future<void> resetDatabase() async {
+    final databasePath = await getDatabasesPath();
+    final path = join(databasePath, 'recipesapp.db');
+    await deleteDatabase(path);
+    _database = null; // Reset the singleton instance
+  }
+
   // Method to initialize the database
   Future<Database> _initDatabase() async {
     final databasePath = await getDatabasesPath();
@@ -47,10 +55,26 @@ class DatabaseHelper {
         await db.execute('''
           CREATE TABLE meal (
             meal_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            meal_type INTEGER,
+            date TEXT,
+            type_id INTEGER,
             recipe_id INTEGER,
-            FOREIGN KEY (recipe_id) REFERENCES recipes (recipe_id)
+            FOREIGN KEY (recipe_id) REFERENCES recipes (recipe_id),
+            FOREIGN KEY (type_id) REFERENCES meal_types (type_id)
           )
+        ''');
+
+        // Create meal types
+        await db.execute('''
+          CREATE TABLE meal_types (
+            type_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            type_name TEXT UNIQUE
+          )
+        ''');
+
+        // Insert default meal types
+        await db.execute('''
+          INSERT INTO meal_types (type_name) VALUES 
+          ('Breakfast'), ('Lunch'), ('Dinner'), ('Snack')
         ''');
 
         // Create calendar table

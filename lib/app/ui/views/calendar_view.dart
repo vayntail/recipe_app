@@ -7,6 +7,7 @@ import 'package:recipe_app/app/ui/components/recipe_button.dart';
 import 'package:recipe_app/app/ui/screens/meal_selection_screen.dart';
 import 'package:recipe_app/app/ui/widgets/texts_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:recipe_app/app/db/calendardb_operations.dart';
 
 class CalendarView extends StatefulWidget {
   const CalendarView({super.key});
@@ -15,159 +16,288 @@ class CalendarView extends StatefulWidget {
 }
 
 class _CalendarViewState extends State<CalendarView> {
-  CalendarFormat format = CalendarFormat.week; // Used to swap when month view button clicked
+  CalendarFormat format = CalendarFormat.week;
   DateTime _selectedDay = DateTime.now();
+  final CalendarOperations _calendarOperations = CalendarOperations();
 
-  // place holder calendar
-  CalendarDay _calendarDay = CalendarDay(
-    breakfast: [], 
-    lunch: [], 
-    dinner: [], 
-    snacks: []
-  );
+  Future<CalendarDay> _loadCalendarDay() async {
+    try {
+      return await _calendarOperations
+          .getCalendarDay(_selectedDay.toIso8601String().split('T')[0]);
+    } catch (e) {
+      print('Error loading calendar day: $e');
+      return CalendarDay(
+        day: _selectedDay.toIso8601String().split('T')[0],
+        breakfast: [],
+        lunch: [],
+        dinner: [],
+        snacks: [],
+      );
+    }
+  }
+
+  void setSelectedDay(DateTime day) {
+    setState(() {
+      _selectedDay = day;
+    });
+  }
+
+  String getDayOfWeek(int weekday) {
+    const days = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ];
+    return days[weekday - 1];
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    // Set the current focused day (Called by calendar.dart)
-    setSelectedDay(DateTime day){
-      setState(() {
-        _selectedDay = day;
-      });
-
-      // Get the selected day's Calendar object from the database using day
-      CalendarDay getCalendarDay(){
-        return _calendarDay;
-      }
-
-    }
-    // Get day of the week from _selectedDay.weekday
-    String getDayOfWeek(int weekday){
-      switch (weekday){
-        case 1:
-          return "Monday";
-        case 2:
-          return "Tuesday";
-        case 3:
-          return "Wednesday";
-        case 4:
-          return "Thursday";
-        case 5:
-          return "Friday";
-        case 6:
-          return "Saturday";
-        case 7:
-          return "Sunday";
-        default:
-          return "";
-      }
-    }
-    
-
     return Scaffold(
         appBar: AppBar(
           centerTitle: false,
           title: appBarTitleText("Calendar"), actions: <Widget>[
+      appBar: AppBar(
+        title: appBarTitleText("Calendar"),
+        actions: <Widget>[
           IconButton(
             onPressed: () {
               setState(() {
-                if (format==CalendarFormat.week){
-                  format=CalendarFormat.month;
-                }
-                else {
-                  format=CalendarFormat.week;
-                }
+                format = format == CalendarFormat.week
+                    ? CalendarFormat.month
+                    : CalendarFormat.week;
               });
             },
             icon: const Icon(Icons.calendar_month),
             selectedIcon: const Icon(Icons.calendar_view_week),
           ),
-        ]),
-        body: Column(
-          children: [
-            Calendar(format: format, setSelectedDay: setSelectedDay,),
-            Expanded(
-              child: ListView(children: [
-                // Display currently selected date to screen
-                headingText("${getDayOfWeek(_selectedDay.weekday)}, ${_selectedDay.month}-${_selectedDay.day}"),
-                const Text("Breakfast"),
-                MealTypeColumn(selectedMeals:_calendarDay.breakfast, calendarDay: _calendarDay, mealType: 1,),
-                const Text("Lunch"),
-                MealTypeColumn(selectedMeals:_calendarDay.lunch, calendarDay: _calendarDay, mealType: 2,),
-                const Text("Dinner"),
-                MealTypeColumn(selectedMeals:_calendarDay.dinner, calendarDay: _calendarDay, mealType: 3,),
-                const Text("Snacks"),
-                MealTypeColumn(selectedMeals:_calendarDay.snacks, calendarDay: _calendarDay, mealType: 4,),
-              ]),
-            )
-          ],
-        ));
-  }
-}
-
-class MealTypeColumn extends StatefulWidget {
-  final List<Recipe> selectedMeals; // list of recipes for this mealtype from the data base calendar.
-  final CalendarDay calendarDay;
-  final int mealType; // specify mealtype. 1=breakfast, 2=lunch, 3=dinner 4=snacks
-  const MealTypeColumn({super.key, required this.selectedMeals, required this.calendarDay, required this.mealType});
-
-  @override 
-  State<MealTypeColumn> createState() => _MealTypeColumnState();
-}
-class _MealTypeColumnState extends State<MealTypeColumn> {
-  @override
-  Widget build(BuildContext context) {
-    // Display button per element
-    if (widget.selectedMeals.isNotEmpty){
-        return Column(
-            children: [for (var meal in widget.selectedMeals) 
-            GestureDetector(
-              onTap: () {
-                // On click, open MealSelectionScreen to be able to edit
-                Navigator.push(
-                          context, MaterialPageRoute(
-                            builder: (context) => MealSelectionScreen(selectedMeals: widget.selectedMeals, mealType: widget.mealType,)
-                          )
-                        );
+        ],
+      ),
+      body: Column(
+        children: [
+          Calendar(format: format, setSelectedDay: setSelectedDay),
+          Expanded(
+            child: FutureBuilder<CalendarDay>(
+              future: _loadCalendarDay(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData) {
+                  return const Center(child: Text('No data available'));
+                } else {
+                  final calendarDay = snapshot.data!;
+                  return ListView(
+                    children: [
+                      headingText(
+                          "${getDayOfWeek(_selectedDay.weekday)}, ${_selectedDay.month}-${_selectedDay.day}"),
+                      const Text("Breakfast"),
+                      MealTypeColumn(
+                        selectedMeals: calendarDay.breakfast,
+                        calendarDay: calendarDay,
+                        mealType: 1,
+                        date: _selectedDay,
+                        onMealsUpdated: () => setState(() {}),
+                      ),
+                      const Text("Lunch"),
+                      MealTypeColumn(
+                        selectedMeals: calendarDay.lunch,
+                        calendarDay: calendarDay,
+                        mealType: 2,
+                        date: _selectedDay,
+                        onMealsUpdated: () => setState(() {}),
+                      ),
+                      const Text("Dinner"),
+                      MealTypeColumn(
+                        selectedMeals: calendarDay.dinner,
+                        calendarDay: calendarDay,
+                        mealType: 3,
+                        date: _selectedDay,
+                        onMealsUpdated: () => setState(() {}),
+                      ),
+                      const Text("Snacks"),
+                      MealTypeColumn(
+                        selectedMeals: calendarDay.snacks,
+                        calendarDay: calendarDay,
+                        mealType: 4,
+                        date: _selectedDay,
+                        onMealsUpdated: () => setState(() {}),
+                      ),
+                    ],
+                  );
+                }
               },
-              child: RecipeButton(isMealSelection: true, recipe: meal)
-              )]
-        );
-    }
-    else {
-      // If there are no saved meals, display a "Select a recipe" button
-      return SelectARecipeButton(selectedMeals: widget.selectedMeals, calendarDay: widget.calendarDay, mealType: widget.mealType,);
-    }
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
-
-
-
-
-
-class SelectARecipeButton extends StatefulWidget {
+class MealTypeColumn extends StatelessWidget {
   final List<Recipe> selectedMeals;
   final CalendarDay calendarDay;
-  final int mealType; 
-  const SelectARecipeButton({super.key, required this.selectedMeals, required this.calendarDay, required this.mealType});
+  final int mealType;
+  final DateTime date;
+  final VoidCallback onMealsUpdated;
+
+  const MealTypeColumn({
+    super.key,
+    required this.selectedMeals,
+    required this.calendarDay,
+    required this.mealType,
+    required this.date,
+    required this.onMealsUpdated,
+  });
+
   @override
-  State<SelectARecipeButton> createState() => _SelectARecipeButtonState();
+  Widget build(BuildContext context) {
+    if (selectedMeals.isNotEmpty) {
+      return Column(
+        children: selectedMeals
+            .map((meal) => RecipeItem(
+                  meal: meal,
+                  mealType: mealType,
+                  date: date,
+                  onDelete: () async {
+                    await CalendarOperations().removeMealFromCalendar(
+                      date.toIso8601String().split('T')[0],
+                      mealType,
+                      meal.recipeId,
+                    );
+                    onMealsUpdated();
+                  },
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MealSelectionScreen(
+                          selectedMeals: selectedMeals,
+                          mealType: mealType,
+                          date: date.toIso8601String().split('T')[0],
+                        ),
+                      ),
+                    );
+                    onMealsUpdated();
+                  },
+                ))
+            .toList(),
+      );
+    } else {
+      return SelectARecipeButton(
+        selectedMeals: selectedMeals,
+        calendarDay: calendarDay,
+        mealType: mealType,
+        date: date,
+        onMealsUpdated: onMealsUpdated,
+      );
+    }
+  }
 }
 
-class _SelectARecipeButtonState extends State<SelectARecipeButton> {
+class RecipeItem extends StatefulWidget {
+  final Recipe meal;
+  final int mealType;
+  final DateTime date;
+  final VoidCallback onDelete;
+  final VoidCallback onTap;
+
+  const RecipeItem({
+    super.key,
+    required this.meal,
+    required this.mealType,
+    required this.date,
+    required this.onDelete,
+    required this.onTap,
+  });
+
+  @override
+  _RecipeItemState createState() => _RecipeItemState();
+}
+
+class _RecipeItemState extends State<RecipeItem> {
+  bool _showDeleteButton = false;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context, MaterialPageRoute(
-            // Swap to meal selection screen on click
-            builder: (context) => MealSelectionScreen(selectedMeals: widget.selectedMeals, mealType: widget.mealType,)
-          )
-        );
+      onLongPress: () {
+        setState(() {
+          _showDeleteButton = true;
+        });
       },
-      // Visual
+      onTap: () {
+        if (_showDeleteButton) {
+          setState(() {
+            _showDeleteButton = false;
+          });
+        } else {
+          widget.onTap();
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            if (_showDeleteButton)
+              IconButton(
+                icon: const Icon(Icons.remove_circle, color: Colors.red),
+                onPressed: () {
+                  widget.onDelete();
+                  setState(() {
+                    _showDeleteButton = false;
+                  });
+                },
+              ),
+            Expanded(
+              child: RecipeButton(
+                isMealSelection: true,
+                recipe: widget.meal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SelectARecipeButton extends StatelessWidget {
+  final List<Recipe> selectedMeals;
+  final CalendarDay calendarDay;
+  final int mealType;
+  final DateTime date;
+  final VoidCallback onMealsUpdated;
+
+  const SelectARecipeButton({
+    super.key,
+    required this.selectedMeals,
+    required this.calendarDay,
+    required this.mealType,
+    required this.date,
+    required this.onMealsUpdated,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+        onTap: () async {
+          await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MealSelectionScreen(
+                        selectedMeals: selectedMeals,
+                        mealType: mealType,
+                        date: date.toIso8601String().split('T')[0],
+                      )));
+          onMealsUpdated();
+        },
         child: DottedBorder(
             borderType: BorderType.RRect,
             radius: const Radius.circular(12),

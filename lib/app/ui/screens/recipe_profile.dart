@@ -18,7 +18,6 @@ class RecipeDetailsScreen extends StatefulWidget {
 
 class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
   late Recipe _recipe = widget.recipe;
-  final RecipeOperations _recipeOperations = RecipeOperations();
 
   @override
   void initState() {
@@ -26,36 +25,19 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
     _recipe = widget.recipe;
   }
 
-  Future<void> _getRecipeFromDatabase() async {
-    final updatedRecipe =
-        await _recipeOperations.getRecipeFromId(widget.recipe.recipeId);
-    setState(() {
-      _recipe = updatedRecipe;
-    });
-    debugPrint(_recipe.toString());
-  }
-
-  Future<void> _navigateAndUpdateRecipe() async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => RecipesView(),
-      ),
-    );
-    await _getRecipeFromDatabase();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: 
-        IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: (){
-            // Go to main recipes_view screen. This also refreshes it, and removes all navigator history to start from blank.
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => MainWrapper()), (r) => false);
-          }), 
+        leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              // Go to main recipes_view screen. This also refreshes it, and removes all navigator history to start from blank.
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => MainWrapper()),
+                  (r) => false);
+            }),
         title: Text(_recipe.recipeName),
         actions: [
           IconButton(
