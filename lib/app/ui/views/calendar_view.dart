@@ -65,7 +65,9 @@ class _CalendarViewState extends State<CalendarView> {
     
 
     return Scaffold(
-        appBar: AppBar(title: appBarTitleText("Calendar"), actions: <Widget>[
+        appBar: AppBar(
+          centerTitle: false,
+          title: appBarTitleText("Calendar"), actions: <Widget>[
           IconButton(
             onPressed: () {
               setState(() {

@@ -5,7 +5,7 @@ class ThemeController {
     fontFamily: 'NanumPenScript',
     
         navigationBarTheme: NavigationBarThemeData(
-          backgroundColor: Color.fromARGB(255, 255, 202, 202),
+          backgroundColor: Color.fromARGB(255, 255, 205, 202),
           labelTextStyle: MaterialStateProperty.resolveWith((states){
             if (states.contains(MaterialState.selected)) {
               return const TextStyle(

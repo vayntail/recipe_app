@@ -9,7 +9,8 @@ class SettingsView extends StatelessWidget {
 
 
     return Scaffold(
-      appBar: AppBar(title: appBarTitleText("Settings")),
+      appBar: AppBar(
+        centerTitle: false,title: appBarTitleText("Settings")),
       body: const Column(
         children: [
         ]

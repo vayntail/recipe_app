@@ -44,46 +44,105 @@ class _MainWrapperState extends State<MainWrapper> {
       body: Padding(
         padding: const EdgeInsets.only(top: 40), // Main Container Padding
         child: [
-          const RecipesView(), // Pass the notifier
-          const GroceriesView(),
-          const CalendarView(),
-          const SettingsView(),
+          Stack(
+            children: [
+              const RecipesView(),
+              // Cute cat picture
+              Positioned(
+                top: 20,
+                left: 120,
+                child: SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Image.asset("assets/cats/recipe_cat.png"),)
+              ),
+            ],
+          ),
+          Stack(
+            children: [
+              const GroceriesView(),
+              // Cute cat picture
+              Positioned(
+                top: 20,
+                left: 120,
+                child: SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Image.asset("assets/cats/grocery_cat.png"),)
+              ),
+            ],
+          ),
+          Stack(
+            children: [
+              const CalendarView(),
+              // Cute cat picture
+              Positioned(
+                top: 20,
+                left: 120,
+                child: SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Image.asset("assets/cats/calendar_cat.png"),)
+              ),
+            ],
+          ),
+          Stack(
+            children: [
+              const SettingsView(),
+              // Cute cat picture
+              Positioned(
+                top: 20,
+                left: 120,
+                child: SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Image.asset("assets/cats/setting_cat.png"),)
+              ),
+            ],
+          ),
         ][selectedIndex],
       ),
 
       /// Bottom Nav Bar
-      bottomNavigationBar: NavigationBar(
-        indicatorColor: const Color.fromARGB(0, 255, 255, 255),
-        height: 110,
-        
-        selectedIndex: selectedIndex,
-        onDestinationSelected: (int index) {
-          setState(() {
-            selectedIndex = index;
-          });
-        },
-        destinations: <Widget>[
-          NavigationDestination(
-            icon: Image.asset("assets/icons/recipes_inactive.png"),
-            selectedIcon: Image.asset("assets/icons/recipes_active.png"),
-            label: 'Recipes',
-          ),
-          NavigationDestination(
-            icon: Image.asset("assets/icons/groceries_inactive.png"),
-            selectedIcon: Image.asset("assets/icons/groceries_active.png"),
-            label: 'Groceries',
-          ),
-          NavigationDestination(
-            icon: Image.asset("assets/icons/calendar_inactive.png"),
-            selectedIcon: Image.asset("assets/icons/calendar_active.png"),
-            label: 'Calendar',
-          ),
-          NavigationDestination(
-            icon: Image.asset("assets/icons/settings_inactive.png"),
-            selectedIcon: Image.asset("assets/icons/settings_active.png"),
-            label: 'Settings',
-          ),
-        ],
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(width: 1.5, color: Color.fromARGB(255, 177, 124, 120))
+            )
+        ),
+        child: NavigationBar(
+          indicatorColor: const Color.fromARGB(0, 255, 255, 255),
+          height: 95,
+          
+          selectedIndex: selectedIndex,
+          onDestinationSelected: (int index) {
+            setState(() {
+              selectedIndex = index;
+            });
+          },
+          destinations: <Widget>[
+            NavigationDestination(
+              icon: Image.asset("assets/nav-icons/recipes_inactive.png"),
+              selectedIcon: Image.asset("assets/nav-icons/recipes_active.png"),
+              label: 'Recipes',
+            ),
+            NavigationDestination(
+              icon: Image.asset("assets/nav-icons/groceries_inactive.png"),
+              selectedIcon: Image.asset("assets/nav-icons/groceries_active.png"),
+              label: 'Groceries',
+            ),
+            NavigationDestination(
+              icon: Image.asset("assets/nav-icons/calendar_inactive.png"),
+              selectedIcon: Image.asset("assets/nav-icons/calendar_active.png"),
+              label: 'Calendar',
+            ),
+            NavigationDestination(
+              icon: Image.asset("assets/nav-icons/settings_inactive.png"),
+              selectedIcon: Image.asset("assets/nav-icons/settings_active.png"),
+              label: 'Settings',
+            ),
+          ],
+        ),
       ),
     );
   }

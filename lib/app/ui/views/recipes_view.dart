@@ -24,11 +24,13 @@ class _RecipesViewState extends State<RecipesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       appBar: AppBar(
+        centerTitle: false,
         title: appBarTitleText('Recipes'),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: Image.asset("assets/icons/add.png"),
             tooltip: 'New Recipe',
             onPressed: () {
               Navigator.push(

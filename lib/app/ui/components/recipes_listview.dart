@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_app/app/model/recipe.dart';
 import 'package:recipe_app/app/db/recipedb_operations.dart';
+import 'package:recipe_app/app/ui/widgets/recipe_listview_widgets.dart';
 import 'recipe_button.dart';
 
 class RecipesListView extends StatefulWidget {
@@ -96,64 +97,41 @@ class _RecipesListViewState extends State<RecipesListView> {
     return recipesList;
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Search bar
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: -5),
-              border: OutlineInputBorder(
-                gapPadding: 0,
-              ),
-              fillColor: Color.fromARGB(255, 218, 210, 210),
-              filled: true,
-              hintText: 'Search by recipe or tag...',
-              prefixIcon: Icon(Icons.cake),
-            ),
-            onChanged: (query) {
+        // searchbar
+        searchBar((query){
               setState(() {
                 _searchQuery = query;
               });
               // Trigger a refresh of the recipe list
               _onNotifierChanged();
-            },
+        }),
+        Row(
+          
+          // Tags Filter
+        children: [
+          IconButton(
+            icon: const Icon(Icons.filter_list), // FILTER BUTTON
+            onPressed: (){},
           ),
-        ),
-        // Tags Filter
-        ValueListenableBuilder<List<String>>(
+          ValueListenableBuilder<List<String>>(
           valueListenable: _tagsNotifier,
           builder: (context, tags, child) {
-            return 
-            
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-                child: Positioned(
-                  left: 0,
-                  child: Row(
-                      children: tags.map((tag) {
-                        return ChoiceChip(
-                            label: Text(tag),
-                            selected: _searchQuery == tag,
-                            onSelected: (isSelected) {
-                              setState(() {
-                                _searchQuery = isSelected ? tag : '';
-                              });
-                              // Trigger a refresh of the recipe list
-                              _onNotifierChanged();
-                            },
-                    
-                        );
-                      }).toList(),
-                  ),
-                ),
-
-            );
+            return tagsFilter(tags, _searchQuery, (isSelected, tag){{
+                                setState(() {
+                                  _searchQuery = isSelected ? tag : '';
+                                });
+                                // Trigger a refresh of the recipe list
+                                _onNotifierChanged();
+                              }
+            });
           },
+        ),]
         ),
         // Recipe list
         Expanded(

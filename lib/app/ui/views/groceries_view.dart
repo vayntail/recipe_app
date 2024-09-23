@@ -37,42 +37,83 @@ class _GroceriesViewState extends State<GroceriesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: appBarTitleText("Groceries")),
+        appBar: AppBar(
+          centerTitle: false,title: appBarTitleText("Groceries")),
         body: Padding(
-          padding: const EdgeInsets.only(top: 20, left: 8, right: 8),
+          padding: const EdgeInsets.only(top: 37, left: 8, right: 8,),
           child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.black),
-              borderRadius: BorderRadius.circular(4)
+            decoration: const BoxDecoration(
+              
+              border: Border(
+                top: BorderSide(
+                  width: 1.5,
+                  color: Colors.black,
+                ),
+                left: BorderSide(
+                  width: 1.5,
+                  color: Colors.black,
+                ),
+                right: BorderSide(
+                  width: 1.5,
+                  color: Colors.black,
+                ),
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(7),
+                topRight: Radius.circular(7)
+                )
             ),
-            padding: const EdgeInsets.only(top: 8,left: 4),
-            child: Column(children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  headingText("Today's List"),
-                  Row(
-                    children: [
-                      // Buttons
-                      IconButton(
-                          icon: const Icon(Icons.clear_all),
-                          tooltip: 'Clear All',
-                          onPressed: () {
-                            setState(() {
-                              _clearAllItems();
-                            });
-                          }),
-                      IconButton(
-                          icon: const Icon(Icons.add),
-                          tooltip: 'Add New',
-                          onPressed: () {
-                            setState(() {
-                              _addNewGroceryItem();
-                            });
-                          }),
-                    ],
-                  )
-                ],
+
+            child: Column(
+              children: [
+              Container(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(7),
+                    topRight: Radius.circular(7)
+                  ),
+                  color: Color.fromARGB(255, 250, 225, 219),
+                  border: Border(bottom: BorderSide(
+                    color: Colors.black,
+                    width: 1.5,
+                    ))
+                ),
+                padding: const EdgeInsets.only(left: 18, right: 8, top: 20, bottom: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    headingText("Today's List"),
+                    Row(
+                      children: [
+                        // Buttons
+                        SizedBox(
+                          width: 45,
+                          height: 45,
+                          child: IconButton(
+                              icon: Image.asset('assets/icons/clear.png'),
+                              tooltip: 'Clear All',
+                              onPressed: () {
+                                setState(() {
+                                  _clearAllItems();
+                                });
+                              }),
+                        ),
+                        SizedBox(
+                          width: 45,
+                          height: 45,
+                          child: IconButton(
+                              icon: Image.asset('assets/icons/add2.png'),
+                              tooltip: 'Add New',
+                              onPressed: () {
+                                setState(() {
+                                  _addNewGroceryItem();
+                                });
+                              }),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
               ),
               // FUTURE BUILDER! from getGroceryList()
               FutureBuilder(
@@ -90,11 +131,12 @@ class _GroceriesViewState extends State<GroceriesView> {
                     }
                     return listLoaded? Expanded(
                   child: ListView.builder(
-              itemCount: snapshot.data.length,
-              itemBuilder: (context, index) {
-                debugPrint(snapshot.data.toString());
-                return ListItem(groceryItem: snapshot.data[index]);
-              })): Container();
+                                  itemCount: snapshot.data.length,
+                                  itemBuilder: (context, index) {
+                                    debugPrint(snapshot.data.toString());
+                                    return ListItem(groceryItem: snapshot.data[index]);
+                                  }),
+                  ): Container();
                   })
             ]),
           ),
