@@ -16,6 +16,7 @@ class CalendarView extends StatefulWidget {
 }
 
 class _CalendarViewState extends State<CalendarView> {
+  int currentMonthIndex = 0;
   CalendarFormat format = CalendarFormat.week;
   DateTime _selectedDay = DateTime.now();
   final CalendarOperations _calendarOperations = CalendarOperations();
@@ -55,6 +56,7 @@ class _CalendarViewState extends State<CalendarView> {
     return days[weekday - 1];
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,6 +84,7 @@ class _CalendarViewState extends State<CalendarView> {
         padding: const EdgeInsets.only(top: 30),
         child: Column(
           children: [
+            
             Calendar(format: format, setSelectedDay: setSelectedDay),
             Expanded(
               child: FutureBuilder<CalendarDay>(
@@ -102,13 +105,16 @@ class _CalendarViewState extends State<CalendarView> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding:
-                          const EdgeInsets.only(left: 10, right: 10, top: 20),
+                          const EdgeInsets.only(left: 10, right: 10, top: 8),
                       margin: const EdgeInsets.only(left: 3, right: 3, top: 8),
                       child: ListView(
                         children: [
-                          headingText(
-                              "${getDayOfWeek(_selectedDay.weekday)}, ${_selectedDay.month}-${_selectedDay.day}"),
-                          const Text("Breakfast"),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: headingText(
+                                "${getDayOfWeek(_selectedDay.weekday)}, ${_selectedDay.month}-${_selectedDay.day}"),
+                          ),
+                          heading2Text("Breakfast"),
                           MealTypeColumn(
                             selectedMeals: calendarDay.breakfast,
                             calendarDay: calendarDay,
@@ -116,7 +122,10 @@ class _CalendarViewState extends State<CalendarView> {
                             date: _selectedDay,
                             onMealsUpdated: () => setState(() {}),
                           ),
-                          const Text("Lunch"),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          heading2Text("Lunch"),
                           MealTypeColumn(
                             selectedMeals: calendarDay.lunch,
                             calendarDay: calendarDay,
@@ -124,7 +133,10 @@ class _CalendarViewState extends State<CalendarView> {
                             date: _selectedDay,
                             onMealsUpdated: () => setState(() {}),
                           ),
-                          const Text("Dinner"),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          heading2Text("Dinner"),
                           MealTypeColumn(
                             selectedMeals: calendarDay.dinner,
                             calendarDay: calendarDay,
@@ -132,7 +144,10 @@ class _CalendarViewState extends State<CalendarView> {
                             date: _selectedDay,
                             onMealsUpdated: () => setState(() {}),
                           ),
-                          const Text("Snacks"),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          heading2Text("Snacks"),
                           MealTypeColumn(
                             selectedMeals: calendarDay.snacks,
                             calendarDay: calendarDay,

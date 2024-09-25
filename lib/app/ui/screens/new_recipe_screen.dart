@@ -110,7 +110,7 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
             uniqueTags,
             _ingredientControllers.map((e) => e.text).toList(),
           );
-          id=widget.recipeId as int;
+          id = widget.recipeId as int;
         } else {
           // Insert new recipe
           final int recipeId = await _recipeOperations.insertRecipe(
@@ -150,7 +150,7 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
           recipeId: id,
           imagePath: _imagePath ?? '',
           recipeName: _recipeNameController.text,
-          recipeDescription:_descriptionController.text,
+          recipeDescription: _descriptionController.text,
           hours: _selectedHour,
           minutes: _selectedMinute,
           ingredients: _ingredientControllers.map((e) => e.text).toList(),
@@ -162,8 +162,6 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
         Navigator.pop(context); // Navigate back after saving
         widget.onRecipeSaved(recipe); // pass recipe object
         _resetIngredients();
-        
-        
       } catch (e) {
         print('Error saving recipe: $e');
       }
@@ -240,6 +238,7 @@ class _NewRecipeScreenState extends State<NewRecipeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: const BackButton(),
         title: Text(widget.recipeId != null ? 'Edit Recipe' : 'New Recipe'),

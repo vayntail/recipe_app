@@ -19,6 +19,14 @@ Widget headingText(String text) {
       text);
 }
 
+Widget heading2Text(String text) {
+  return Text(
+      style: const TextStyle(
+        fontSize: 20,
+      ),
+      text);
+}
+
 Widget buttonTitleText(String title) {
   return Text(
       style: const TextStyle(
