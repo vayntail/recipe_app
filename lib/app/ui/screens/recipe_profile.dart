@@ -30,12 +30,12 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () {
               // Go to main recipes_view screen. This also refreshes it, and removes all navigator history to start from blank.
               Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (_) => MainWrapper()),
+                  MaterialPageRoute(builder: (_) => const MainWrapper()),
                   (r) => false);
             }),
         title: Text(_recipe.recipeName),

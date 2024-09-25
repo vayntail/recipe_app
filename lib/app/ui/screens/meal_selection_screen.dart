@@ -52,7 +52,7 @@ class _MealSelectionScreenState extends State<MealSelectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Select Recipes"),
+        title: const Text("Select Recipes"),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),

@@ -346,25 +346,65 @@ class RecipeOperations {
   Future<Recipe> getRecipeFromId(int recipeId) async {
     final db = await _dbHelper.database;
 
-    // Query recipe 
-    final List<Map<String, dynamic>> dbRecipes = await db.query(
-      'recipes',
-      where: 'recipe_id = ?',
-      whereArgs: [recipeId]
-    );
+    // Query recipe
+    final List<Map<String, dynamic>> dbRecipes = await db
+        .query('recipes', where: 'recipe_id = ?', whereArgs: [recipeId]);
     final Map<String, dynamic> dbRecipe = dbRecipes.first;
 
     // Convert into Recipe object
     Recipe recipe = Recipe(
-      recipeId: dbRecipe['recipe_id'], 
-      imagePath: dbRecipe['image_path'], 
-      recipeName: dbRecipe['recipe_name'], 
-      recipeDescription: dbRecipe['recipe_description'], 
-      hours: dbRecipe['hours'], 
-      minutes: dbRecipe['minutes'],
-      directions: dbRecipe['directions'], 
-      link: dbRecipe['link']
-      );
+        recipeId: dbRecipe['recipe_id'],
+        imagePath: dbRecipe['image_path'],
+        recipeName: dbRecipe['recipe_name'],
+        recipeDescription: dbRecipe['recipe_description'],
+        hours: dbRecipe['hours'],
+        minutes: dbRecipe['minutes'],
+        directions: dbRecipe['directions'],
+        link: dbRecipe['link']);
     return recipe;
+  }
+
+  Future<List<Recipe>> getSortedRecipes(
+      {required String sortBy, required bool ascending}) async {
+    final db = await _dbHelper.database;
+    String orderBy;
+
+    switch (sortBy) {
+      case 'alphabetical':
+        orderBy = 'recipe_name';
+        break;
+      case 'chronological':
+        orderBy = 'recipe_id';
+        break;
+      default:
+        orderBy = 'recipe_id';
+    }
+
+    orderBy += ascending ? ' ASC' : ' DESC';
+
+    final List<Map<String, dynamic>> dbRecipes =
+        await db.query('recipes', orderBy: orderBy);
+    List<Recipe> recipes = [];
+
+    for (var dbRecipe in dbRecipes) {
+      final List<String> tags = await getTagsForRecipe(dbRecipe['recipe_id']);
+      final List<String> ingredients =
+          await getIngredientsForRecipe(dbRecipe['recipe_id']);
+
+      recipes.add(Recipe(
+        recipeId: dbRecipe['recipe_id'],
+        imagePath: dbRecipe['image_path'],
+        recipeName: dbRecipe['recipe_name'],
+        recipeDescription: dbRecipe['recipe_description'],
+        hours: dbRecipe['hours'],
+        minutes: dbRecipe['minutes'],
+        directions: dbRecipe['directions'],
+        link: dbRecipe['link'],
+        tags: tags,
+        ingredients: ingredients,
+      ));
+    }
+
+    return recipes;
   }
 }

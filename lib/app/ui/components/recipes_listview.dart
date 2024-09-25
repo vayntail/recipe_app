@@ -17,7 +17,7 @@ class RecipesListView extends StatefulWidget {
     required this.isMealSelection,
     this.addToSelectedMeals,
     this.removeFromSelectedMeals,
-    this.notifier, 
+    this.notifier,
     this.checkIfInSelectedMeals,
     this.refreshScreen,
   });
@@ -31,34 +31,33 @@ class _RecipesListViewState extends State<RecipesListView> {
   late Future<List<Recipe>> _recipesFuture;
   String _searchQuery = '';
   final ValueNotifier<List<String>> _tagsNotifier = ValueNotifier([]);
+  String _sortBy = 'chronological';
+  bool _sortAscending = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchRecipes(); // Initialize the Future
+    _fetchRecipes();
     _loadTags();
-    widget.notifier
-        ?.addListener(_onNotifierChanged); // Listen for notifier changes
+    widget.notifier?.addListener(_onNotifierChanged);
   }
 
   @override
   void dispose() {
-    widget.notifier?.removeListener(_onNotifierChanged); // Clean up listener
+    widget.notifier?.removeListener(_onNotifierChanged);
     _tagsNotifier.dispose();
     super.dispose();
   }
 
   void _onNotifierChanged() {
-    _fetchRecipes(); // Refresh recipes when notifier changes
-    _loadTags(); // Refresh tags when notifier changes
+    _fetchRecipes();
+    _loadTags();
   }
 
   Future<void> _loadTags() async {
     try {
-      final RecipeOperations recipeOperations = RecipeOperations();
-      List<String> tags = await recipeOperations.getAllTags();
-      print(tags); // Debugging: Check if tags are fetched
-      _tagsNotifier.value = tags.toSet().toList(); // Update notifier value
+      List<String> tags = await _recipeOperations.getAllTags();
+      _tagsNotifier.value = tags.toSet().toList();
     } catch (e) {
       print('Failed to load tags: $e');
     }
@@ -66,25 +65,18 @@ class _RecipesListViewState extends State<RecipesListView> {
 
   Future<void> _fetchRecipes() async {
     setState(() {
-      _recipesFuture = _getRecipes();
+      _recipesFuture = _getSortedRecipes();
     });
   }
 
-  Future<List<Recipe>> _getRecipes() async {
-    // Fetch the list of recipes
-    List<Recipe> recipesList = await _recipeOperations.getRecipes();
+  Future<List<Recipe>> _getSortedRecipes() async {
+    List<Recipe> recipes = await _recipeOperations.getSortedRecipes(
+      sortBy: _sortBy,
+      ascending: _sortAscending,
+    );
 
-    // Update each recipe with its associated tags
-    for (var recipe in recipesList) {
-      // Fetch tags for the recipe
-      final tags = await _recipeOperations.getTagsForRecipe(recipe.recipeId);
-      // Set the tags for the recipe
-      recipe.tags = tags;
-    }
-
-    // Filter recipes based on the search query if it's not empty
     if (_searchQuery.isNotEmpty) {
-      recipesList = recipesList.where((recipe) {
+      recipes = recipes.where((recipe) {
         final nameMatch = recipe.recipeName
             .toLowerCase()
             .contains(_searchQuery.toLowerCase());
@@ -94,46 +86,90 @@ class _RecipesListViewState extends State<RecipesListView> {
       }).toList();
     }
 
-    return recipesList;
+    return recipes;
   }
 
+  void _showSortOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                title: const Text('Sort by'),
+                trailing: DropdownButton<String>(
+                  value: _sortBy,
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _sortBy = newValue;
+                      });
+                      _fetchRecipes();
+                      Navigator.pop(context);
+                    }
+                  },
+                  items: <String>['chronological', 'alphabetical']
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value.capitalize()),
+                    );
+                  }).toList(),
+                ),
+              ),
+              SwitchListTile(
+                title: const Text('Ascending Order'),
+                value: _sortAscending,
+                onChanged: (bool value) {
+                  setState(() {
+                    _sortAscending = value;
+                  });
+                  _fetchRecipes();
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // searchbar
-        searchBar((query){
-              setState(() {
-                _searchQuery = query;
-              });
-              // Trigger a refresh of the recipe list
-              _onNotifierChanged();
+        searchBar((query) {
+          setState(() {
+            _searchQuery = query;
+          });
+          _onNotifierChanged();
         }),
         Row(
-          
-          // Tags Filter
-        children: [
-          IconButton(
-            icon: const Icon(Icons.filter_list), // FILTER BUTTON
-            onPressed: (){},
-          ),
-          ValueListenableBuilder<List<String>>(
-          valueListenable: _tagsNotifier,
-          builder: (context, tags, child) {
-            return tagsFilter(tags, _searchQuery, (isSelected, tag){{
-                                setState(() {
-                                  _searchQuery = isSelected ? tag : '';
-                                });
-                                // Trigger a refresh of the recipe list
-                                _onNotifierChanged();
-                              }
-            });
-          },
-        ),]
+          children: [
+            IconButton(
+              icon: const Icon(Icons.filter_list),
+              onPressed: _showSortOptions,
+            ),
+            Expanded(
+              child: ValueListenableBuilder<List<String>>(
+                valueListenable: _tagsNotifier,
+                builder: (context, tags, child) {
+                  return tagsFilter(tags, _searchQuery, (isSelected, tag) {
+                    setState(() {
+                      _searchQuery = isSelected ? tag : '';
+                    });
+                    _onNotifierChanged();
+                  });
+                },
+              ),
+            ),
+          ],
         ),
-        // Recipe list
         Expanded(
           child: FutureBuilder<List<Recipe>>(
             future: _recipesFuture,
@@ -155,9 +191,8 @@ class _RecipesListViewState extends State<RecipesListView> {
                       isMealSelection: widget.isMealSelection,
                       recipe: snapshot.data![index],
                       onDelete: () {
-                        _fetchRecipes(); // Refresh the list on delete
-                        widget.notifier
-                            ?.notifyListeners(); // Ensure tag list is updated
+                        _fetchRecipes();
+                        widget.notifier?.notifyListeners();
                       },
                     );
                   },
@@ -168,5 +203,11 @@ class _RecipesListViewState extends State<RecipesListView> {
         ),
       ],
     );
+  }
+}
+
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1)}";
   }
 }

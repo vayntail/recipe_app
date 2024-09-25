@@ -68,8 +68,8 @@ class CalendarOperations {
       DateTime start, DateTime end) async {
     List<CalendarDay> days = [];
     for (var day = start;
-        day.isBefore(end.add(Duration(days: 1)));
-        day = day.add(Duration(days: 1))) {
+        day.isBefore(end.add(const Duration(days: 1)));
+        day = day.add(const Duration(days: 1))) {
       String dateStr = day.toIso8601String().split('T')[0];
       CalendarDay calendarDay = await getCalendarDay(dateStr);
       days.add(calendarDay);

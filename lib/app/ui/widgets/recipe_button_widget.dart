@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_app/app/model/recipe.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:recipe_app/app/ui/widgets/recipe_listview_widgets.dart';
-import 'package:recipe_app/app/ui/themes/theme_controller.dart';
-import 'dart:io';
 import 'package:recipe_app/app/ui/widgets/texts_widget.dart';
 
 // Widget button used for recipe_button
@@ -72,4 +69,3 @@ Widget recipeButtonWidget(Recipe recipe, bool mealButton) {
                 '${recipe.hours}hr. ${recipe.minutes}min.'))
       ]));
 }
-
